@@ -1,0 +1,36 @@
+body {
+    font-family: sans-serif;
+    text-align: center; /* Centraliza o conteúdo horizontalmente */
+    color: rgb(0, 0, 0); /* Define a cor do texto para azul */
+  }
+  
+  h1 {
+    color: rgb(0, 0, 0); /* Garante que o título também seja azul */
+  }
+  
+  #carroImagem {
+    width: 210px;
+    margin-bottom: 10px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+    color: rgb(0, 0, 0); /* Cor do texto nos botões */
+    background-color: rgb(255, 255, 255); /* Cor de fundo dos botões (opcional) */
+    border: 2px solid rgb(0, 0, 0); /* Adiciona uma borda azul (opcional) */
+  }
+  
+  button:hover {
+    background-color: lightblue; /* Cor de fundo ao passar o mouse (opcional) */
+  }
+  
+  #status {
+    color: rgb(0, 0, 0);
+  }
+  
+  #velocidade {
+    color: rgb(0, 0, 0);
+  }
