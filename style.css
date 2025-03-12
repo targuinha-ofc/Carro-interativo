@@ -1,11 +1,11 @@
 body {
     font-family: sans-serif;
-    text-align: center; /* Centraliza o conteúdo horizontalmente */
-    color: rgb(0, 0, 0); /* Define a cor do texto para azul */
+    text-align: center;
+    color: rgb(0, 68, 255);
   }
   
   h1 {
-    color: rgb(0, 0, 0); /* Garante que o título também seja azul */
+    color: rgb(0, 0, 0);
   }
   
   #carroImagem {
@@ -18,13 +18,13 @@ body {
     font-size: 16px;
     margin: 5px;
     cursor: pointer;
-    color: rgb(0, 0, 0); /* Cor do texto nos botões */
-    background-color: rgb(255, 255, 255); /* Cor de fundo dos botões (opcional) */
-    border: 2px solid rgb(0, 0, 0); /* Adiciona uma borda azul (opcional) */
+    color: rgb(0, 0, 0);
+    background-color: rgb(100, 198, 255);
+    border: 2px solid rgb(0, 0, 0);
   }
   
   button:hover {
-    background-color: lightblue; /* Cor de fundo ao passar o mouse (opcional) */
+    background-color: rgb(0, 195, 255);
   }
   
   #status {
@@ -34,3 +34,31 @@ body {
   #velocidade {
     color: rgb(0, 0, 0);
   }
+  body {
+    font-family: Arial, sans-serif;
+  }
+  
+  h1, h2 {
+    text-align: center;
+  }
+  
+  input, button {
+    margin: 5px;
+    padding: 8px;
+  }
+  
+  p {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  #carroEsportivoImagem {
+    width: 210px;
+    margin-bottom: 10px;
+    
+
+  }
+  #caminhaoImagem {
+    width: 210px;
+    margin-bottom: 10px;
+  }
+  
