@@ -1,55 +1,79 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Carro Interativo e Herança</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <h1>Meu Carro Interativo</h1>
 
+  <h2>Carro Base</h2>
   <img id="carroImagem" src="https://th.bing.com/th/id/OIP.CFsTHKqc9ZPFyXX6Yo8bRAHaE6?pid=ImgDet&w=203&h=134&c=7" alt="Imagem do Carro" width="300">
+<input type="text" id="modeloBase" placeholder="Modelo">
+<input type="text" id="corBase" placeholder="Cor">
+<button onclick="criarCarroBase()">Criar Carro Base</button><br><br>
+<button onclick="interagir(meuCarro, 'ligar')">Ligar</button>
+<button onclick="interagir(meuCarro, 'desligar')">Desligar</button>
+<button onclick="interagir(meuCarro, 'acelerar')">Acelerar</button>
+<button onclick="interagir(meuCarro, 'frear')">Frear</button>
+<div id="informacoesCarroBase"></div>
+<p id="status"></p>
+<p id="velocidade">Velocidade: 0 km/h</p>
 
-  <p id="status">Status: Desligado</p>
-  <p id="velocidade">Velocidade: 0 km/h</p>
-
-  <button id="ligarBtn">Ligar</button>
-  <button id="desligarBtn">Desligar</button>
-  <button id="acelerarBtn">Acelerar</button>
-  <button id="frearBtn">Frear</button>
 
   <h2>Carro Esportivo</h2>
-   <img id="carroEsportivoImagem" src="https://mundofixa.com/wp-content/uploads/2016/08/3310.jpg" alt="Imagem do Carro Esportivo" width="300">
+  <img id="carroEsportivoImagem" src="https://mundofixa.com/wp-content/uploads/2016/08/3310.jpg"
+    alt="Imagem do Carro Esportivo" width="300">
   <input type="text" id="modeloEsportivo" placeholder="Modelo">
   <input type="text" id="corEsportivo" placeholder="Cor">
   <button onclick="criarCarroEsportivo()">Criar Carro Esportivo</button><br><br>
-  <button onclick="ligarCarroEsportivo()">Ligar</button>
-  <button onclick="desligarCarroEsportivo()">Desligar</button>
-  <button onclick="acelerarCarroEsportivo()">Acelerar</button>
-  <button onclick="frearCarroEsportivo()">Frear</button>
-  <button onclick="ativarTurbo()">Ativar Turbo</button>
-  <button onclick="desativarTurbo()">Desativar Turbo</button>
+  <button onclick="interagir(carroEsportivo, 'ligar')">Ligar</button>
+  <button onclick="interagir(carroEsportivo, 'desligar')">Desligar</button>
+  <button onclick="interagir(carroEsportivo, 'acelerar')">Acelerar</button>
+  <button onclick="interagir(carroEsportivo, 'frear')">Frear</button>
+  <button onclick="interagir(carroEsportivo, 'ativarTurbo')">Ativar Turbo</button>
+  <button onclick="interagir(carroEsportivo, 'desativarTurbo')">Desativar Turbo</button>
   <p id="statusEsportivo"></p>
   <p id="statusEsportivoStatus"></p>
-    <p id="velocidadeEsportivo">Velocidade: 0 km/h</p>
+  <p id="velocidadeEsportivo">Velocidade: 0 km/h</p>
 
   <h2>Caminhao</h2>
-  <img id="caminhaoImagem" src="https://th.bing.com/th/id/OIP.jRVf81yzCngCs0PuZNEE8AHaFi?rs=1&pid=ImgDetMain" alt="Imagem do Caminhão" width="300">
+  <img id="caminhaoImagem" src="https://th.bing.com/th/id/OIP.jRVf81yzCngCs0PuZNEE8AHaFi?rs=1&pid=ImgDetMain"
+    alt="Imagem do Caminhão" width="300">
   <input type="text" id="modeloCaminhao" placeholder="Modelo">
   <input type="text" id="corCaminhao" placeholder="Cor">
   <input type="number" id="capacidadeCarga" placeholder="Capacidade de Carga">
   <button onclick="criarCaminhao()">Criar Caminhao</button><br><br>
-  <button onclick="ligarCaminhao()">Ligar</button>
-  <button onclick="desligarCaminhao()">Desligar</button>
-  <button onclick="acelerarCaminhao()">Acelerar</button>
-  <button onclick="frearCaminhao()">Frear</button>
+  <button onclick="interagir(caminhao, 'ligar')">Ligar</button>
+  <button onclick="interagir(caminhao, 'desligar')">Desligar</button>
+  <button onclick="interagir(caminhao, 'acelerar')">Acelerar</button>
+  <button onclick="interagir(caminhao, 'frear')">Frear</button>
   <input type="number" id="pesoCarga" placeholder="Peso da Carga">
-  <button onclick="carregarCaminhao()">Carregar</button>
-  <button onclick="descarregarCaminhao()">Descarregar</button>
+  <button onclick="interagir(caminhao, 'carregar')">Carregar</button>
+  <button onclick="interagir(caminhao, 'descarregar')">Descarregar</button>
   <p id="statusCaminhao"></p>
   <p id="statusCaminhaoStatus"></p>
   <p id="statusCaminhaoCarga"></p>
-   <p id="velocidadeCaminhao">Velocidade: 0 km/h</p>
+  <p id="velocidadeCaminhao">Velocidade: 0 km/h</p>
+
+  <h2>Informações do Veículo</h2>
+  <div id="informacoesVeiculo"></div>
+
+  <button onclick="exibirInformacoesCarroBase()">Exibir Carro Base</button>
+  <button onclick="exibirInformacoesCarroEsportivo()">Exibir Carro Esportivo</button>
+  <button onclick="exibirInformacoesCaminhao()">Exibir Caminhão</button>
 
   <script src="script.js"></script>
+  <script>
+      function criarCarroBase() {
+        const modelo = document.getElementById("modeloBase").value;
+        const cor = document.getElementById("corBase").value;
+        meuCarro = new Carro(modelo, cor);
+        exibirInformacoesCarroBase();
+      }
+  </script>
 </body>
+
 </html>
