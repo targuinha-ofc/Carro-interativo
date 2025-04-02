@@ -1,176 +1,278 @@
-/* style.css */
+/* style.css - Enhanced Version */
 
+/* --- Global Styles & Typography --- */
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    color: rgb(0, 68, 255);
-    margin: 20px;
-    background-color: #f4f4f4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Nicer font stack */
+    margin: 0; /* Remove default body margin */
+    padding: 0;
+    background-color: #f0f2f5; /* Lighter gray background */
     color: #333;
-  }
-  
-  h1,
-  h2 {
-    text-align: center;
-    color: #0056b3;
-    margin-bottom: 10px;
-  }
-  
-  h1 {
-    color: rgb(0, 0, 0);
-  }
-  
-  /* Styles for Carro Base Image */
-  #carroImagem {
-    width: 210px;
-    margin-bottom: 10px;
-    max-width: 100%;
-    height: auto;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 5px;
-    background-color: #fff;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  /* Styles for Carro Esportivo Image */
-  #carroEsportivoImagem {
-    width: 210px;
-    margin-bottom: 10px;
-    max-width: 100%;
-    height: auto;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 5px;
-    background-color: #fff;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  /* Styles for Caminhao Image */
-  #caminhaoImagem {
-    width: 210px;
-    margin-bottom: 10px;
-    max-width: 100%;
-    height: auto;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 5px;
-    background-color: #fff;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  button {
-    padding: 10px 20px;
-    font-size: 16px;
-    margin: 5px;
-    cursor: pointer;
-    color: rgb(0, 0, 0);
-    background-color: rgb(100, 198, 255);
-    border: 2px solid rgb(0, 0, 0);
-    transition: background-color 0.3s ease;
-  }
-  
-  button:hover {
-    background-color: rgb(0, 195, 255);
-  }
-  
-  #status,
-  #velocidade {
-    color: rgb(0, 0, 0);
-  }
-  
-  input,
-  button {
-    margin: 5px;
-    padding: 8px;
-  }
-  
-  p {
-    margin-top: 10px;
-    font-weight: bold;
     line-height: 1.6;
-    margin-bottom: 10px;
-  }
-  
-  /* Styles for the vehicle information display */
-  #informacoesCarroBase,
-  #informacoesCarroEsportivo,
-  #informacoesCaminhao {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fff;
-    width: 200px;
-    text-align: center;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center content horizontally */
+    min-height: 100vh;
+}
+
+h1, h2 {
+    color: #1d3557; /* Dark blue for headings */
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    color: #003366; /* Slightly different dark blue */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+h2 {
+    font-size: 1.8em;
+    border-bottom: 2px solid #a8dadc; /* Light teal accent border */
+    padding-bottom: 5px;
+    margin-top: 10px; /* Reduced top margin inside sections */
+}
+
+p {
+    margin-top: 8px;
+    margin-bottom: 12px;
+    font-size: 0.95em;
+    color: #457b9d; /* Muted blue for status text */
+}
+
+/* --- Layout Container --- */
+#vehicleContainer { /* Add this div in HTML to wrap the sections */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center sections */
+    gap: 30px; /* Space between sections */
+    padding: 20px;
+    width: 100%;
+    max-width: 1200px; /* Limit overall width */
+    box-sizing: border-box;
+}
+
+/* --- Vehicle Section Styling --- */
+.vehicleSection {
+    background-color: #ffffff; /* White background for sections */
+    border-radius: 10px; /* Rounded corners */
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    flex: 1; /* Allow sections to grow */
+    min-width: 320px; /* Minimum width */
+    max-width: 380px; /* Maximum width */
+    margin: 0; /* Remove margin, use gap from container */
+    box-sizing: border-box;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.vehicleSection:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+
+/* --- Image Styling --- */
+img { /* Apply to all images */
+    max-width: 100%;
+    height: 180px; /* Fixed height for consistency */
+    object-fit: cover; /* Crop images nicely */
+    border-radius: 8px; /* Rounded image corners */
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0; /* Subtle border */
+    display: block;
     margin-left: auto;
     margin-right: auto;
-  }
-  
-  #informacoesCarroBase>*,
-  #informacoesCarroEsportivo>*,
-  #informacoesCaminhao>* {
-    /* Target direct children of #informacoesVeiculo */
-    margin-bottom: 5px;
-    text-align: left;
-  }
-  
-  /* Error Message Display */
-  #error-message {
-    color: red;
-    margin-top: 10px;
-  }
-  
-  /* Add Flexbox styles to the vehicle container */
-  #vehicleContainer {
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  .vehicleSection {
-    flex: 1;
-    min-width: 300px;
-    margin: 10px;
+}
+
+/* --- Input Field Styling --- */
+input[type="text"],
+input[type="number"] {
+    width: 90%;
+    padding: 12px; /* More padding */
+    margin-bottom: 12px; /* Space below inputs */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
     box-sizing: border-box;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 600px) {
-    body {
-      margin: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #457b9d; /* Highlight border on focus */
+    box-shadow: 0 0 5px rgba(69, 123, 157, 0.3); /* Subtle glow */
+    outline: none; /* Remove default outline */
+}
+
+/* --- Button Styling --- */
+button {
+    background-color: #457b9d; /* Primary action blue */
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    font-size: 0.95em;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 5px 4px;
+    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+button:hover {
+    background-color: #1d3557; /* Darker blue on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+button:active {
+    background-color: #0b1a2a; /* Even darker when clicked */
+    transform: translateY(0px);
+     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Specific Button Variations (Optional) */
+button[onclick*="ligar"],
+button[onclick*="criar"],
+button[onclick*="ativarTurbo"],
+button[onclick*="carregar"] {
+    background-color: #5a8a3e; /* Green for positive actions */
+}
+button[onclick*="ligar"]:hover,
+button[onclick*="criar"]:hover,
+button[onclick*="ativarTurbo"]:hover,
+button[onclick*="carregar"]:hover {
+    background-color: #44692f;
+}
+button[onclick*="ligar"]:active,
+button[onclick*="criar"]:active,
+button[onclick*="ativarTurbo"]:active,
+button[onclick*="carregar"]:active {
+    background-color: #314d22;
+}
+
+
+button[onclick*="desligar"],
+button[onclick*="frear"],
+button[onclick*="desativarTurbo"],
+button[onclick*="descarregar"] {
+    background-color: #e63946; /* Red for negative/stopping actions */
+}
+button[onclick*="desligar"]:hover,
+button[onclick*="frear"]:hover,
+button[onclick*="desativarTurbo"]:hover,
+button[onclick*="descarregar"]:hover {
+    background-color: #c32f3b;
+}
+button[onclick*="desligar"]:active,
+button[onclick*="frear"]:active,
+button[onclick*="desativarTurbo"]:active,
+button[onclick*="descarregar"]:active {
+    background-color: #a02630;
+}
+
+
+/* --- Information Display Div Styling --- */
+#informacoesCarroBase,
+#informacoesCarroEsportivo,
+#informacoesCaminhao {
+    background-color: #e9ecef; /* Very light gray background */
+    border: 1px solid #ced4da; /* Light border */
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 20px;
+    text-align: left; /* Left align text inside */
+    font-size: 0.9em;
+    line-height: 1.5;
+    word-wrap: break-word;
+    min-height: 70px; /* Ensure space */
+    color: #495057; /* Darker gray text */
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 1024px) {
+    #vehicleContainer {
+        gap: 20px;
+        padding: 15px;
     }
-  
-    button {
-      width: 100%;
-      margin-right: 0;
+     .vehicleSection {
+        min-width: 300px;
     }
-  
+}
+
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+    }
+    h2 {
+        font-size: 1.5em;
+    }
+    #vehicleContainer {
+        flex-direction: column; /* Stack sections */
+        align-items: center; /* Center stacked sections */
+        gap: 25px;
+    }
+    .vehicleSection {
+        width: 90%; /* Make sections wider */
+        max-width: 500px; /* Allow them to be wider on tablet */
+        min-width: unset; /* Remove min-width */
+        padding: 20px;
+    }
     input[type="text"],
     input[type="number"] {
-      width: 100%;
-      box-sizing: border-box;
+        width: 95%;
     }
-  
-    img {
-      width: 100%;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 5px; /* Reduce body padding */
     }
-  
-    /* Adjust informacoesVeiculo for smaller screens */
-    #informacoesCarroBase,
-    #informacoesCarroEsportivo,
-    #informacoesCaminhao {
-      position: static;
-      transform: none;
-      margin-top: 20px;
-      width: 100%;
-      text-align: center;
-      display: block;
+     h1 {
+        font-size: 1.8em;
+         margin-top: 20px;
+         margin-bottom: 20px;
     }
-  }
+     h2 {
+        font-size: 1.3em;
+    }
+    #vehicleContainer {
+        padding: 10px;
+        gap: 20px;
+    }
+    .vehicleSection {
+        width: 95%; /* Almost full width */
+        padding: 15px;
+    }
+    button {
+        padding: 9px 15px;
+        font-size: 0.9em;
+        width: calc(50% - 10px); /* Two buttons per row approx */
+    }
+    button[onclick*="criar"] { /* Make create button full width */
+        width: calc(100% - 10px);
+    }
+     input[type="text"],
+    input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.95em;
+    }
+     img {
+         height: 150px;
+     }
+      #informacoesCarroBase,
+      #informacoesCarroEsportivo,
+      #informacoesCaminhao {
+          padding: 12px;
+          font-size: 0.85em;
+      }
+}
