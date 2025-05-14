@@ -1,278 +1,459 @@
-/* style.css - Enhanced Version */
+/* style.css - Garagem Inteligente Pro */
 
-/* --- Global Styles & Typography --- */
+/* --- Variables & Global Reset --- */
+:root {
+    --primary-color: #3A86FF;
+    --secondary-color: #FFBE0B;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --bg-light: #F8F9FA;
+    --bg-card: #FFFFFF;
+    --border-color: #DEE2E6;
+    --text-dark: #212529;
+    --text-medium: #495057;
+    --text-light: #6C757D;
+    --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --border-radius: 0.375rem;
+    --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    --box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --sidebar-width: 260px;
+    --sidebar-bg: #2c3e50; /* Dark blue/grey */
+    --sidebar-text: #ced4da;
+    --sidebar-active-bg: #16a085; /* Teal */
+    --sidebar-hover-bg: #1e2b37;
+    --sidebar-header-bg: #1abc9c; /* Brighter Teal */
+    --footer-height: 50px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Nicer font stack */
-    margin: 0; /* Remove default body margin */
-    padding: 0;
-    background-color: #f0f2f5; /* Lighter gray background */
-    color: #333;
+    font-family: var(--font-family-sans-serif);
+    margin: 0;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
     line-height: 1.6;
+    font-size: 16px;
+    display: flex; /* For footer pushing */
+    flex-direction: column; /* For footer pushing */
+    min-height: 100vh; /* For footer pushing */
+}
+
+/* --- Ícones (Placeholder - Adicione sua biblioteca de ícones) --- */
+.icon-garage::before { content: "🚗"; margin-right: 8px; font-style: normal; }
+.icon-calendar::before { content: "📅"; margin-right: 8px; font-style: normal; }
+.icon-reports::before { content: "📊"; margin-right: 8px; font-style: normal; }
+
+
+/* --- Estrutura Principal --- */
+#app-shell {
     display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    align-items: center; /* Center content horizontally */
-    min-height: 100vh;
+    flex-grow: 1; /* Allows main content to take available space */
 }
 
-h1, h2 {
-    color: #1d3557; /* Dark blue for headings */
+#sidebar {
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    transition: width 0.3s;
+    padding-top: 0; /* Header da sidebar tem seu próprio padding */
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* Previne que a sidebar encolha */
+}
+
+.sidebar-header {
+    padding: 20px;
+    background: var(--sidebar-header-bg);
     text-align: center;
-    margin-bottom: 15px;
 }
-
-h1 {
-    font-size: 2.5em;
-    margin-top: 30px;
-    margin-bottom: 30px;
-    color: #003366; /* Slightly different dark blue */
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-}
-
-h2 {
+.sidebar-header h3 {
+    color: #fff;
+    margin: 0;
     font-size: 1.8em;
-    border-bottom: 2px solid #a8dadc; /* Light teal accent border */
-    padding-bottom: 5px;
-    margin-top: 10px; /* Reduced top margin inside sections */
 }
 
-p {
-    margin-top: 8px;
-    margin-bottom: 12px;
-    font-size: 0.95em;
-    color: #457b9d; /* Muted blue for status text */
+#sidebar ul.components {
+    padding: 20px 0;
+    list-style: none; /* Remove default list styling */
+    margin: 0; /* Remove default margin */
 }
 
-/* --- Layout Container --- */
-#vehicleContainer { /* Add this div in HTML to wrap the sections */
+#sidebar ul li a {
+    padding: 15px 20px;
+    font-size: 1.1em;
+    display: flex; /* For icon alignment */
+    align-items: center; /* For icon alignment */
+    color: var(--sidebar-text);
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    border-left: 4px solid transparent;
+}
+#sidebar ul li a:hover {
+    color: #fff;
+    background: var(--sidebar-hover-bg);
+    border-left-color: var(--secondary-color);
+}
+#sidebar ul li a.active-view {
+    color: #fff;
+    background: var(--sidebar-active-bg);
+    border-left-color: var(--secondary-color);
+    font-weight: 500;
+}
+
+#notifications-area-sidebar {
+    margin-top: auto;
+    padding: 15px;
+    max-height: 250px;
+    overflow-y: auto;
+    border-top: 1px solid #47748b;
+}
+#notifications-area-sidebar .notification {
+    width: 100%;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    padding: 10px 12px;
+    border-radius: var(--border-radius);
+}
+
+#main-content-area {
+    flex-grow: 1;
+    padding: 0;
+    background-color: var(--bg-light);
+    overflow-y: auto;
+}
+#main-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #539BFF 100%);
+    color: white;
+    padding: 20px 30px;
+    margin-bottom: 25px;
+    box-shadow: var(--box-shadow-sm);
+}
+#main-header h1 {
+    margin: 0;
+    font-size: 2.1em;
+    font-weight: 500;
+}
+
+.view-section {
+    padding: 0 30px 30px 30px;
+}
+.view-section.active { display: block; }
+.view-section:not(.active) { display: none; }
+
+/* --- Elementos Gerais da UI --- */
+h2 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 2em;
+    font-weight: 500;
+}
+h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 1.6em;
+    font-weight: 500;
+}
+section {
+    background-color: var(--bg-card);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 30px;
+}
+label {
+    font-weight: 500;
+    margin-right: 8px;
+    color: var(--text-medium);
+    margin-bottom: 5px; /* For stacked labels */
+    display: block; /* For stacked labels */
+}
+input[type="text"], input[type="number"], input[type="date"], select, textarea {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1em;
+    flex-grow: 1;
+    min-width: 180px;
+    background-color: #fff;
+    color: var(--text-dark);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    width: 100%; /* Ensure full width within parent */
+}
+input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, select:focus, textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
+    outline: none;
+}
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: white;
+    border: 1px solid transparent;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease-in-out;
+    margin: 5px 4px;
+    box-shadow: var(--box-shadow-sm);
+}
+button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.1);
+}
+button:active {
+    transform: translateY(0px);
+    filter: brightness(0.95);
+}
+button:disabled {
+    background-color: var(--text-light);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+#add-vehicle-button, #add-appointment-button {
+    background-color: var(--success-color);
+}
+#remove-vehicle-button {
+    background-color: var(--error-color);
+}
+.controls-group {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center; /* Center sections */
-    gap: 30px; /* Space between sections */
-    padding: 20px;
-    width: 100%;
-    max-width: 1200px; /* Limit overall width */
-    box-sizing: border-box;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
 }
+.controls-group:last-child { border-bottom: none; margin-bottom: 0; }
 
-/* --- Vehicle Section Styling --- */
-.vehicleSection {
-    background-color: #ffffff; /* White background for sections */
-    border-radius: 10px; /* Rounded corners */
-    padding: 25px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Softer shadow */
-    flex: 1; /* Allow sections to grow */
-    min-width: 320px; /* Minimum width */
-    max-width: 380px; /* Maximum width */
-    margin: 0; /* Remove margin, use gap from container */
-    box-sizing: border-box;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.vehicleSection:hover {
-    transform: translateY(-5px); /* Slight lift on hover */
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-
-/* --- Image Styling --- */
-img { /* Apply to all images */
-    max-width: 100%;
-    height: 180px; /* Fixed height for consistency */
-    object-fit: cover; /* Crop images nicely */
-    border-radius: 8px; /* Rounded image corners */
+/* --- Painel do Veículo Selecionado & Abas --- */
+#selected-vehicle-panel h2 { border-bottom: none; margin-bottom: 0; } /* No header da seção */
+.selected-vehicle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
-    border: 1px solid #e0e0e0; /* Subtle border */
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
 }
-
-/* --- Input Field Styling --- */
-input[type="text"],
-input[type="number"] {
-    width: 90%;
-    padding: 12px; /* More padding */
-    margin-bottom: 12px; /* Space below inputs */
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1em;
-    box-sizing: border-box;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus {
-    border-color: #457b9d; /* Highlight border on focus */
-    box-shadow: 0 0 5px rgba(69, 123, 157, 0.3); /* Subtle glow */
-    outline: none; /* Remove default outline */
-}
-
-/* --- Button Styling --- */
-button {
-    background-color: #457b9d; /* Primary action blue */
-    color: white;
-    border: none;
-    padding: 10px 18px;
+.vehicle-view-tabs .tab-button {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 8px 15px;
+    margin-left: 10px;
     font-size: 0.95em;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    margin: 5px 4px;
-    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+.vehicle-view-tabs .tab-button:hover, .vehicle-view-tabs .tab-button.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+.vehicle-view-tabs .tab-button.active { font-weight: bold; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
-button:hover {
-    background-color: #1d3557; /* Darker blue on hover */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    transform: translateY(-1px);
+.vehicle-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    align-items: start;
 }
+.vehicle-image-container img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--box-shadow-sm);
+}
+.vehicle-info-container p, .vehicle-maintenance-container p {
+    margin-bottom: 12px;
+    font-size: 1em;
+    color: var(--text-medium);
+}
+.vehicle-info-container p strong, .vehicle-maintenance-container p strong {
+    color: var(--text-dark);
+}
+#vehicle-info-specific span.status-value, #vehicle-status span.status-ok, #vehicle-status span.status-vencido {
+    font-weight: 500; padding: 3px 8px; border-radius: 0.25rem; margin-left: 4px; color: white;
+}
+#vehicle-info-specific span.status-ok, #vehicle-status span.status-ok { background-color: var(--success-color); }
+#vehicle-info-specific span.status-vencido, #vehicle-status span.status-vencido { background-color: var(--error-color); }
 
-button:active {
-    background-color: #0b1a2a; /* Even darker when clicked */
-    transform: translateY(0px);
-     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+.vehicle-actions-container, .vehicle-maintenance-container {
+    padding: 20px;
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
 }
+.vehicle-actions-container button, .vehicle-maintenance-container button {
+    width: calc(50% - 8px); margin: 4px;
+}
+.vehicle-actions-container button[data-action="buzinar"],
+.vehicle-actions-container button[data-action="ativarTurbo"],
+.vehicle-actions-container button[data-action="desativarTurbo"],
+.vehicle-maintenance-container button[data-action="serviceGeneral"] {
+    width: calc(100% - 8px);
+}
+#truck-load-actions {
+    margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);
+    display: flex; flex-direction: column; gap: 10px;
+}
+#truck-load-actions input[type="number"] { width: calc(100% - 8px); margin: 0 4px 5px 4px; }
+#truck-load-actions .truck-buttons-group { display: flex; gap: 0; }
+#truck-load-actions .truck-buttons-group button { width: calc(50% - 8px); }
 
-/* Specific Button Variations (Optional) */
-button[onclick*="ligar"],
-button[onclick*="criar"],
-button[onclick*="ativarTurbo"],
-button[onclick*="carregar"] {
-    background-color: #5a8a3e; /* Green for positive actions */
+/* --- Manutenção e Histórico --- */
+#maintenance-status-report strong { color: var(--text-dark); }
+#maintenance-status-report span.status-badge {
+    display: inline-block; padding: 3px 8px; border-radius: 0.25rem;
+    font-size: 0.85em; font-weight: 500; margin-left: 5px; line-height: 1.2;
+    text-align: center; min-width: 70px; color: white;
 }
-button[onclick*="ligar"]:hover,
-button[onclick*="criar"]:hover,
-button[onclick*="ativarTurbo"]:hover,
-button[onclick*="carregar"]:hover {
-    background-color: #44692f;
-}
-button[onclick*="ligar"]:active,
-button[onclick*="criar"]:active,
-button[onclick*="ativarTurbo"]:active,
-button[onclick*="carregar"]:active {
-    background-color: #314d22;
-}
+#maintenance-status-report span.status-ok { background-color: var(--success-color); }
+#maintenance-status-report span.status-proximo { background-color: var(--warning-color); color: var(--text-dark); }
+#maintenance-status-report span.status-vencido { background-color: var(--error-color); }
+#km-driven { font-weight: 600; color: var(--primary-color); }
 
-
-button[onclick*="desligar"],
-button[onclick*="frear"],
-button[onclick*="desativarTurbo"],
-button[onclick*="descarregar"] {
-    background-color: #e63946; /* Red for negative/stopping actions */
+/* --- Tabelas --- */
+.table-responsive { overflow-x: auto; margin-top: 20px; }
+table {
+    width: 100%; border-collapse: collapse; margin-bottom: 20px;
+    background-color: #fff; box-shadow: var(--box-shadow-sm);
 }
-button[onclick*="desligar"]:hover,
-button[onclick*="frear"]:hover,
-button[onclick*="desativarTurbo"]:hover,
-button[onclick*="descarregar"]:hover {
-    background-color: #c32f3b;
-}
-button[onclick*="desligar"]:active,
-button[onclick*="frear"]:active,
-button[onclick*="desativarTurbo"]:active,
-button[onclick*="descarregar"]:active {
-    background-color: #a02630;
-}
+th, td { padding: 12px 15px; border: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
+th { background-color: var(--bg-light); font-weight: 600; color: var(--primary-color); }
+tbody tr:nth-child(even) { background-color: #f9f9f9; }
+tbody tr:hover { background-color: #e9ecef; }
+td .action-button { padding: 6px 10px; font-size: 0.9em; margin-right: 6px; }
+td .action-button.complete { background-color: var(--success-color); }
+td .action-button.cancel { background-color: var(--error-color); }
+td .action-button.remove { background-color: var(--error-color); } /* Alias */
 
+/* --- Formulários de Agendamento --- */
+.form-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px; margin-bottom: 20px;
+}
+.form-group.full-width { grid-column: 1 / -1; }
+textarea { min-height: 80px; font-family: var(--font-family-sans-serif); }
 
-/* --- Information Display Div Styling --- */
-#informacoesCarroBase,
-#informacoesCarroEsportivo,
-#informacoesCaminhao {
-    background-color: #e9ecef; /* Very light gray background */
-    border: 1px solid #ced4da; /* Light border */
-    border-radius: 6px;
-    padding: 15px;
-    margin-top: 20px;
-    text-align: left; /* Left align text inside */
+/* Status de Agendamento */
+.status-agendado { color: var(--info-color); font-weight: bold; }
+.status-concluido { color: var(--success-color); font-weight: bold; }
+.status-cancelado { color: var(--error-color); font-weight: bold; text-decoration: line-through; }
+
+/* --- Notificações (Geral - para sidebar) --- */
+.notification {
+    padding: 15px 20px; border-radius: var(--border-radius); color: white;
+    font-size: 0.95em; box-shadow: 0 4px 8px rgba(0,0,0,0.15); opacity: 1;
+    transform: translateX(0); animation: fadeInNotification 0.3s ease-out;
+}
+@keyframes fadeInNotification { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+.notification.fade-out { opacity: 0; transform: translateX(20px) scale(0.95); transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
+.notification.info { background-color: var(--info-color); }
+.notification.success { background-color: var(--success-color); }
+.notification.error { background-color: var(--error-color); }
+.notification.warning { background-color: var(--warning-color); color: var(--text-dark); }
+
+/* --- Footer --- */
+#app-footer {
+    text-align: center;
+    padding: 15px 0;
+    background-color: var(--text-dark);
+    color: var(--bg-light);
     font-size: 0.9em;
-    line-height: 1.5;
-    word-wrap: break-word;
-    min-height: 70px; /* Ensure space */
-    color: #495057; /* Darker gray text */
+    height: var(--footer-height);
+    flex-shrink: 0; /* Previne que o footer encolha */
+}
+#notifications-area-footer { /* Para telas pequenas, se movido para cá */
+    position: fixed;
+    bottom: calc(var(--footer-height) + 10px); /* Acima do footer */
+    right: 15px;
+    left: 15px;
+    width: auto; /* Ocupa espaço disponível */
+    max-width: 400px; /* Limite */
+    margin: 0 auto; /* Centralizar */
+    z-index: 1000;
+    display: none; /* Escondido por padrão, JS/media query controla */
+    flex-direction: column-reverse;
+    gap: 10px;
 }
 
-/* --- Responsiveness --- */
-@media (max-width: 1024px) {
-    #vehicleContainer {
-        gap: 20px;
-        padding: 15px;
-    }
-     .vehicleSection {
-        min-width: 300px;
-    }
-}
 
+/* --- Responsividade --- */
+@media (max-width: 992px) {
+    :root { --sidebar-width: 220px; }
+    .sidebar-header h3 { font-size: 1.5em; }
+    #sidebar ul li a { font-size: 1em; padding: 12px 15px; }
+    .vehicle-actions-container button, .vehicle-maintenance-container button { width: calc(100% - 8px); }
+}
 
 @media (max-width: 768px) {
-    h1 {
-        font-size: 2em;
+    :root { --sidebar-width: 100%; } /* Full width para sidebar horizontal */
+    #app-shell { flex-direction: column; }
+    #sidebar {
+        height: auto; position: relative; padding-top: 0;
+        order: -1; /* Coloca a sidebar no topo visualmente */
+        width: 100%;
     }
-    h2 {
-        font-size: 1.5em;
+    .sidebar-header { display: none; }
+    #sidebar ul.components {
+        display: flex; justify-content: space-around; padding: 0; border-bottom: 1px solid var(--sidebar-hover-bg);
     }
-    #vehicleContainer {
-        flex-direction: column; /* Stack sections */
-        align-items: center; /* Center stacked sections */
-        gap: 25px;
+    #sidebar ul li { flex-grow: 1; text-align: center; }
+    #sidebar ul li a {
+        padding: 12px 5px; font-size: 0.9em;
+        border-left: none; border-bottom: 3px solid transparent;
+        justify-content: center; /* Centraliza ícone e texto */
     }
-    .vehicleSection {
-        width: 90%; /* Make sections wider */
-        max-width: 500px; /* Allow them to be wider on tablet */
-        min-width: unset; /* Remove min-width */
-        padding: 20px;
+    #sidebar ul li a:hover, #sidebar ul li a.active-view {
+        border-left: none; border-bottom-color: var(--secondary-color);
     }
-    input[type="text"],
-    input[type="number"] {
-        width: 95%;
-    }
+    #notifications-area-sidebar { display: none; } /* Mover para footer */
+    #notifications-area-footer { display: flex; } /* Mostrar no footer */
+
+    #main-header h1 { font-size: 1.8em; }
+    .view-section { padding: 0 15px 15px 15px; }
+    section { padding: 20px; }
+
+    .selected-vehicle-header { flex-direction: column; align-items: flex-start; }
+    .selected-vehicle-header h2 { font-size: 1.6em; }
+    .vehicle-view-tabs { margin-top: 10px; width: 100%; display: flex; }
+    .vehicle-view-tabs .tab-button { flex-grow: 1; margin-left: 0; margin-right: 5px; font-size: 0.9em; padding: 8px 10px;}
+    .vehicle-view-tabs .tab-button:last-child { margin-right: 0; }
+
+    .controls-group { flex-direction: column; align-items: stretch; }
+    .controls-group input, .controls-group select, .controls-group button { width: 100%; margin-bottom: 10px; }
+    
+    .vehicle-details-grid { grid-template-columns: 1fr; }
+    .vehicle-image-container img { max-height: 220px; }
+
+    .form-grid { grid-template-columns: 1fr; } /* Stack form fields */
 }
 
 @media (max-width: 480px) {
-    body {
-        padding: 5px; /* Reduce body padding */
-    }
-     h1 {
-        font-size: 1.8em;
-         margin-top: 20px;
-         margin-bottom: 20px;
-    }
-     h2 {
-        font-size: 1.3em;
-    }
-    #vehicleContainer {
-        padding: 10px;
-        gap: 20px;
-    }
-    .vehicleSection {
-        width: 95%; /* Almost full width */
-        padding: 15px;
-    }
-    button {
-        padding: 9px 15px;
-        font-size: 0.9em;
-        width: calc(50% - 10px); /* Two buttons per row approx */
-    }
-    button[onclick*="criar"] { /* Make create button full width */
-        width: calc(100% - 10px);
-    }
-     input[type="text"],
-    input[type="number"] {
-        width: 100%;
-        padding: 10px;
-        font-size: 0.95em;
-    }
-     img {
-         height: 150px;
-     }
-      #informacoesCarroBase,
-      #informacoesCarroEsportivo,
-      #informacoesCaminhao {
-          padding: 12px;
-          font-size: 0.85em;
-      }
+    body { font-size: 14px; }
+    #main-header h1 { font-size: 1.6em; }
+    #sidebar ul li a { font-size: 0.85em; padding: 10px 5px;}
+    .icon-garage::before, .icon-calendar::before, .icon-reports::before { margin-right: 4px;}
+    h2 { font-size: 1.6em; } h3 { font-size: 1.3em; }
+    section { padding: 15px; }
+    button { padding: 10px 15px; font-size: 0.95em; }
+    input[type="text"], input[type="number"], input[type="date"], select, textarea { padding: 10px 12px; }
+    .vehicle-view-tabs .tab-button { font-size: 0.85em; padding: 7px 8px;}
 }

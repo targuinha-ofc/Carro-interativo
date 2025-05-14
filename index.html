@@ -1,84 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 
 <head>
-  <title>Carro Interativo e Herança</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garagem Inteligente Pro</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <h1>Meu Carro Interativo</h1>
+  <div id="app-shell">
+    <nav id="sidebar">
+      <div class="sidebar-header">
+        <h3>Garagem Pro</h3>
+      </div>
+      <ul class="list-unstyled components">
+        <li><a href="#" data-view="garage-view" class="active-view"><i class="icon-garage"></i> Minha Garagem</a></li>
+        <li><a href="#" data-view="scheduling-view"><i class="icon-calendar"></i> Agendamentos</a></li>
+        <!-- Futuramente: <li><a href="#" data-view="reports-view"><i class="icon-reports"></i> Relatórios</a></li> -->
+      </ul>
+      <div id="notifications-area-sidebar">
+        <!-- Notifications will appear here for better visibility -->
+      </div>
+    </nav>
 
-  <!-- Seção Carro Base -->
-  <div class="vehicleSection">
-    <h2>Carro Base</h2>
-    <img id="carroImagem" src="https://th.bing.com/th/id/OIP.CFsTHKqc9ZPFyXX6Yo8bRAHaE6?pid=ImgDet&w=203&h=134&c=7" alt="Imagem do Carro" width="300">
-    <input type="text" id="modeloBase" placeholder="Modelo">
-    <input type="text" id="corBase" placeholder="Cor">
-    <button onclick="criarCarroBase()">Criar Carro Base</button><br><br>
-    <button onclick="interagir(meuCarro, 'ligar')">Ligar</button>
-    <button onclick="interagir(meuCarro, 'desligar')">Desligar</button>
-    <button onclick="interagir(meuCarro, 'acelerar')">Acelerar</button>
-    <button onclick="interagir(meuCarro, 'frear')">Frear</button>
-    <button onclick="interagir(meuCarro, 'buzinar')">Buzinar</button> <!-- Added -->
-    <p id="status">Status: Desligado</p> <!-- Initial state -->
-    <p id="velocidade">Velocidade: 0 km/h</p>
-    <div id="informacoesCarroBase">Carro Base não criado.</div> <!-- Info Display Div -->
-  </div>
+    <div id="main-content-area">
+      <header id="main-header">
+        <h1 id="current-view-title">Minha Garagem</h1>
+      </header>
 
-  <!-- Seção Carro Esportivo -->
-  <div class="vehicleSection">
-    <h2>Carro Esportivo</h2>
-    <img id="carroEsportivoImagem" src="https://mundofixa.com/wp-content/uploads/2016/08/3310.jpg" alt="Imagem do Carro Esportivo" width="300">
-    <input type="text" id="modeloEsportivo" placeholder="Modelo">
-    <input type="text" id="corEsportivo" placeholder="Cor">
-    <button onclick="criarCarroEsportivo()">Criar Carro Esportivo</button><br><br>
-    <button onclick="interagir(carroEsportivo, 'ligar')">Ligar</button>
-    <button onclick="interagir(carroEsportivo, 'desligar')">Desligar</button>
-    <button onclick="interagir(carroEsportivo, 'acelerar')">Acelerar</button>
-    <button onclick="interagir(carroEsportivo, 'frear')">Frear</button>
-    <button onclick="interagir(carroEsportivo, 'ativarTurbo')">Ativar Turbo</button>
-    <button onclick="interagir(carroEsportivo, 'desativarTurbo')">Desativar Turbo</button>
-    <button onclick="interagir(carroEsportivo, 'buzinar')">Buzinar</button> <!-- Added -->
-    <!-- Note: Changed ID from statusEsportivo to match the expected display area -->
-    <p id="statusEsportivoStatus">Status do Esportivo: Desligado</p> <!-- Initial state & Correct ID -->
-    <p id="velocidadeEsportivo">Velocidade: 0 km/h</p>
-    <div id="informacoesCarroEsportivo">Carro Esportivo não criado.</div> <!-- Info Display Div -->
-  </div>
+      <!-- VIEW: Minha Garagem -->
+      <main id="garage-view" class="view-section active">
+        <section id="garage-management-panel">
+          <h2>Gerenciar Veículos</h2>
+          <div class="controls-group">
+            <select id="vehicle-type-selector">
+              <option value="Veiculo">Carro Padrão</option>
+              <option value="CarroEsportivo">Carro Esportivo</option>
+              <option value="Caminhao">Caminhão</option>
+            </select>
+            <input type="text" id="new-vehicle-model" placeholder="Modelo do Veículo" required>
+            <input type="text" id="new-vehicle-color" placeholder="Cor" required>
+            <input type="text" id="new-vehicle-image" placeholder="URL da Imagem (Opcional)">
+            <input type="number" id="new-truck-capacity" placeholder="Capacidade Carga (kg)" style="display:none;" min="1">
+            <button id="add-vehicle-button">Adicionar à Garagem</button>
+          </div>
+          <div class="controls-group">
+            <label for="vehicle-selector">Selecionar Veículo:</label>
+            <select id="vehicle-selector">
+              <option value="">-- Nenhum Veículo --</option>
+            </select>
+            <button id="remove-vehicle-button" disabled>Remover Selecionado</button>
+          </div>
+        </section>
 
-  <!-- Seção Caminhão -->
-  <div class="vehicleSection">
-    <h2>Caminhao</h2>
-    <img id="caminhaoImagem" src="https://th.bing.com/th/id/OIP.jRVf81yzCngCs0PuZNEE8AHaFi?rs=1&pid=ImgDetMain" alt="Imagem do Caminhão" width="300">
-    <input type="text" id="modeloCaminhao" placeholder="Modelo">
-    <input type="text" id="corCaminhao" placeholder="Cor">
-    <input type="number" id="capacidadeCarga" placeholder="Capacidade de Carga (kg)">
-    <button onclick="criarCaminhao()">Criar Caminhao</button><br><br>
-    <button onclick="interagir(caminhao, 'ligar')">Ligar</button>
-    <button onclick="interagir(caminhao, 'desligar')">Desligar</button>
-    <button onclick="interagir(caminhao, 'acelerar')">Acelerar</button>
-    <button onclick="interagir(caminhao, 'frear')">Frear</button>
-    <button onclick="interagir(caminhao, 'buzinar')">Buzinar</button> <!-- Added -->
-    <input type="number" id="pesoCarga" placeholder="Peso da Carga (kg)">
-    <button onclick="interagir(caminhao, 'carregar')">Carregar</button>
-    <button onclick="interagir(caminhao, 'descarregar')">Descarregar</button>
-    <!-- Note: Changed ID from statusCaminhao to match the expected display area -->
-    <p id="statusCaminhaoStatus">Status do Caminhão: Desligado</p> <!-- Initial state & Correct ID -->
-    <p id="statusCaminhaoCarga">Carga: 0/0 kg</p> <!-- Initial state -->
-    <p id="velocidadeCaminhao">Velocidade: 0 km/h</p>
-    <div id="informacoesCaminhao">Caminhão não criado.</div> <!-- Info Display Div -->
-  </div>
+        <section id="selected-vehicle-panel" style="display:none;">
+          <div class="selected-vehicle-header">
+            <h2 id="selected-vehicle-name">Detalhes do Veículo</h2>
+            <div class="vehicle-view-tabs">
+                <button data-tab="details" class="tab-button active">Detalhes & Ações</button>
+                <button data-tab="history" class="tab-button">Histórico Manutenção</button>
+            </div>
+          </div>
 
-  <!-- Section for explicitly showing info (optional but kept from original) -->
-  <!-- You might want to remove these if the divs above are sufficient -->
-  <!-- <h2>Informações do Veículo</h2>
-  <div id="informacoesVeiculo"></div>
-  <button onclick="exibirInformacoesCarroBase()">Exibir Carro Base</button>
-  <button onclick="exibirInformacoesCarroEsportivo()">Exibir Carro Esportivo</button>
-  <button onclick="exibirInformacoesCaminhao()">Exibir Caminhão</button> -->
+          <!-- TAB: Detalhes do Veículo -->
+          <div id="vehicle-details-tab" class="tab-content active">
+            <div class="vehicle-details-grid">
+              <div class="vehicle-image-container">
+                <img id="vehicle-image" src="https://via.placeholder.com/400x250.png?text=Selecione+um+Veículo" alt="Imagem do Veículo">
+              </div>
+              <div class="vehicle-info-container">
+                <h3>Informações</h3>
+                <p id="vehicle-info-basic">Modelo: -, Cor: -</p>
+                <p id="vehicle-status">Status: Desligado</p>
+                <p id="vehicle-speed">Velocidade: 0 km/h</p>
+                <p id="vehicle-info-specific">--</p>
+              </div>
+              <div class="vehicle-actions-container">
+                <h3>Ações do Veículo</h3>
+                <button data-action="ligar">Ligar</button>
+                <button data-action="desligar">Desligar</button>
+                <button data-action="acelerar">Acelerar</button>
+                <button data-action="frear">Frear</button>
+                <button data-action="buzinar">Buzinar</button>
+                <button data-action="ativarTurbo" style="display:none;">Ativar Turbo</button>
+                <button data-action="desativarTurbo" style="display:none;">Desativar Turbo</button>
+                <div id="truck-load-actions" style="display:none;">
+                  <input type="number" id="truck-cargo-weight" placeholder="Peso Carga (kg)" min="1">
+                  <div class="truck-buttons-group">
+                    <button data-action="carregar">Carregar</button>
+                    <button data-action="descarregar">Descarregar</button>
+                  </div>
+                </div>
+              </div>
+              <div class="vehicle-maintenance-container">
+                <h3>Manutenção Corrente</h3>
+                <p id="maintenance-status-report">--</p>
+                <button data-action="serviceOil">Trocar Óleo</button>
+                <button data-action="serviceTires">Verificar Pneus</button>
+                <button data-action="serviceGeneral">Revisão Geral</button>
+                <p><em>(Distância simulada: <span id="km-driven">0</span> km)</em></p>
+              </div>
+            </div>
+          </div>
 
+          <!-- TAB: Histórico de Manutenção -->
+          <div id="vehicle-history-tab" class="tab-content">
+            <h3>Histórico de Manutenção para <span id="history-vehicle-model"></span></h3>
+            <div class="table-responsive">
+                <table id="maintenance-history-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo de Serviço</th>
+                            <th>KM na Manutenção</th>
+                            <th>Observações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Linhas do histórico serão inseridas aqui -->
+                    </tbody>
+                </table>
+            </div>
+            <p id="no-maintenance-history" style="display:none;">Nenhum histórico de manutenção para este veículo.</p>
+          </div>
+        </section>
+      </main>
+
+      <!-- VIEW: Agendamentos -->
+      <main id="scheduling-view" class="view-section" style="display: none;">
+        <section id="add-appointment-panel">
+          <h2>Novo Agendamento</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="appointment-vehicle-selector">Veículo:</label>
+              <select id="appointment-vehicle-selector">
+                <option value="">-- Selecione um Veículo --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="appointment-date">Data:</label>
+              <input type="date" id="appointment-date" required>
+            </div>
+            <div class="form-group">
+              <label for="appointment-service-type">Tipo de Serviço:</label>
+              <input type="text" id="appointment-service-type" placeholder="Ex: Troca de Óleo, Revisão Completa" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="appointment-notes">Observações:</label>
+              <textarea id="appointment-notes" placeholder="Detalhes adicionais (opcional)"></textarea>
+            </div>
+          </div>
+          <button id="add-appointment-button">Agendar Manutenção</button>
+        </section>
+
+        <section id="appointments-list-panel">
+          <h2>Agendamentos Futuros e Passados</h2>
+          <div class="table-responsive">
+            <table id="appointments-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Veículo</th>
+                  <th>Serviço</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Linhas de agendamento aqui -->
+              </tbody>
+            </table>
+          </div>
+          <p id="no-appointments" style="display:none;">Nenhum agendamento encontrado.</p>
+        </section>
+      </main>
+
+    </div> <!-- Fim de main-content-area -->
+  </div> <!-- Fim de app-shell -->
+
+  <footer id="app-footer"> <!-- Adicionado ID para referência -->
+    <p>© 2024 Garagem Inteligente Pro Inc.</p>
+    <div id="notifications-area-footer" style="display: none;"> 
+        <!-- Notifications for small screens -->
+    </div>
+  </footer>
   <script src="script.js"></script>
-  <!-- Removed inline script -->
 </body>
-
 </html>
