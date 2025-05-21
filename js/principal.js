@@ -7,7 +7,7 @@ import Manutencao from './models/manutençao.js';
 import Carro from './models/Carro.js';
 import CarroEsportivo from './models/Carroesportivo.js';
 import Caminhao from './models/caminhao.js';
-import { showNotification, hideNotification } from './utils/notificações.js';
+import { showNotification, hideNotification } from './utils/app.js';
 
 // --- Referências aos Elementos da UI (Garagem) ---
 const ui = {
