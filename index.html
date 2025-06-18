@@ -1,195 +1,190 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garagem Inteligente V3 - API Sim & Previsão do Tempo</title>
-
-    <!-- Google Fonts (Poppins) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garagem Inteligente Pro</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div id="app-container">
+  <div id="app-shell">
+    <nav id="sidebar">
+      <div class="sidebar-header">
+        <h3>Garagem Pro</h3>
+      </div>
+      <ul class="list-unstyled components">
+        <li><a href="#" data-view="garage-view" class="active-view"><i class="icon-garage"></i> Minha Garagem</a></li>
+        <li><a href="#" data-view="scheduling-view"><i class="icon-calendar"></i> Agendamentos</a></li>
+        <!-- Futuramente: <li><a href="#" data-view="reports-view"><i class="icon-reports"></i> Relatórios</a></li> -->
+      </ul>
+      <div id="notifications-area-sidebar">
+        <!-- Notifications will appear here for better visibility -->
+      </div>
+    </nav>
 
-        <!-- Barra Lateral -->
-        <aside id="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-warehouse"></i><h1>Garagem V3</h1>
+    <div id="main-content-area">
+      <header id="main-header">
+        <h1 id="current-view-title">Minha Garagem</h1>
+      </header>
+
+      <!-- VIEW: Minha Garagem -->
+      <main id="garage-view" class="view-section active">
+        <section id="garage-management-panel">
+          <h2>Gerenciar Veículos</h2>
+          <div class="controls-group">
+            <select id="vehicle-type-selector">
+              <option value="Veiculo">Carro Padrão</option>
+              <option value="CarroEsportivo">Carro Esportivo</option>
+              <option value="Caminhao">Caminhão</option>
+            </select>
+            <input type="text" id="new-vehicle-model" placeholder="Modelo do Veículo" required>
+            <input type="text" id="new-vehicle-color" placeholder="Cor" required>
+            <input type="text" id="new-vehicle-image" placeholder="URL da Imagem (Opcional)">
+            <input type="number" id="new-truck-capacity" placeholder="Capacidade Carga (kg)" style="display:none;" min="1">
+            <button id="add-vehicle-button">Adicionar à Garagem</button>
+          </div>
+          <div class="controls-group">
+            <label for="vehicle-selector">Selecionar Veículo:</label>
+            <select id="vehicle-selector">
+              <option value="">-- Nenhum Veículo --</option>
+            </select>
+            <button id="remove-vehicle-button" disabled>Remover Selecionado</button>
+          </div>
+        </section>
+
+        <section id="selected-vehicle-panel" style="display:none;">
+          <div class="selected-vehicle-header">
+            <h2 id="selected-vehicle-name">Detalhes do Veículo</h2>
+            <div class="vehicle-view-tabs">
+                <button data-tab="details" class="tab-button active">Detalhes & Ações</button>
+                <button data-tab="history" class="tab-button">Histórico Manutenção</button>
             </div>
-            <button id="btnAbrirModalAdicionar" class="botao-sidebar-add">
-                <i class="fas fa-plus-circle"></i> Adicionar Novo Veículo
-            </button>
-             <div class="lista-veiculos-container card">
-                 <h2><i class="fas fa-car"></i> Meus Veículos</h2>
-                 <ul id="listaVeiculosSidebar">
-                     <li class="placeholder">Nenhum veículo na garagem.</li>
-                 </ul>
-             </div>
-        </aside>
+          </div>
 
-        <!-- Conteúdo Principal -->
-        <main id="main-content">
-
-            <div id="notification-area" class="notification" style="display: none;">
-                <span id="notification-message"></span>
-                <button class="close-btn" title="Fechar notificação" aria-label="Fechar notificação">×</button>
+          <!-- TAB: Detalhes do Veículo -->
+          <div id="vehicle-details-tab" class="tab-content active">
+            <div class="vehicle-details-grid">
+              <div class="vehicle-image-container">
+                <img id="vehicle-image" src="https://via.placeholder.com/400x250.png?text=Selecione+um+Veículo" alt="Imagem do Veículo">
+              </div>
+              <div class="vehicle-info-container">
+                <h3>Informações</h3>
+                <p id="vehicle-info-basic">Modelo: -, Cor: -</p>
+                <p id="vehicle-status">Status: Desligado</p>
+                <p id="vehicle-speed">Velocidade: 0 km/h</p>
+                <p id="vehicle-info-specific">--</p>
+              </div>
+              <div class="vehicle-actions-container">
+                <h3>Ações do Veículo</h3>
+                <button data-action="ligar">Ligar</button>
+                <button data-action="desligar">Desligar</button>
+                <button data-action="acelerar">Acelerar</button>
+                <button data-action="frear">Frear</button>
+                <button data-action="buzinar">Buzinar</button>
+                <button data-action="ativarTurbo" style="display:none;">Ativar Turbo</button>
+                <button data-action="desativarTurbo" style="display:none;">Desativar Turbo</button>
+                <div id="truck-load-actions" style="display:none;">
+                  <input type="number" id="truck-cargo-weight" placeholder="Peso Carga (kg)" min="1">
+                  <div class="truck-buttons-group">
+                    <button data-action="carregar">Carregar</button>
+                    <button data-action="descarregar">Descarregar</button>
+                  </div>
+                </div>
+              </div>
+              <div class="vehicle-maintenance-container">
+                <h3>Manutenção Corrente</h3>
+                <p id="maintenance-status-report">--</p>
+                <button data-action="serviceOil">Trocar Óleo</button>
+                <button data-action="serviceTires">Verificar Pneus</button>
+                <button data-action="serviceGeneral">Revisão Geral</button>
+                <p><em>(Distância simulada: <span id="km-driven">0</span> km)</em></p>
+              </div>
             </div>
+          </div>
 
-            <!-- Painel do Veículo Selecionado -->
-            <div id="painelVeiculoSelecionado" style="display: none;" class="card">
-
-                <div class="vehicle-header">
-                     <img id="imagemVeiculo" src="imagens/carro_normal.png" alt="Imagem do veículo">
-                     <div id="informacoesVeiculo">
-                         <h2 id="info-modelo-tipo">Modelo (Tipo)</h2>
-                         <p><i class="fas fa-palette"></i> Cor: <span id="info-cor">N/A</span></p>
-                         <p><i class="fas fa-id-card"></i> ID: <span id="info-id" class="info-id-text">N/A</span></p>
-                     </div>
-                     <button id="botaoRemoverVeiculoHeader" class="botao-remover-header" title="Remover este veículo" aria-label="Remover este veículo da garagem"><i class="fas fa-trash-alt"></i></button>
-                 </div>
-
-                 <nav class="tabs-veiculo" role="tablist">
-                    <button class="tab-link active" data-tab="tab-visao-geral" role="tab" aria-selected="true" aria-controls="tab-visao-geral"><i class="fas fa-tachometer-alt"></i> Visão Geral</button>
-                    <button class="tab-link" data-tab="tab-manutencao" role="tab" aria-selected="false" aria-controls="tab-manutencao"><i class="fas fa-wrench"></i> Manutenção</button>
-                </nav>
-
-                <!-- Aba Visão Geral -->
-                <div id="tab-visao-geral" class="tab-content active" role="tabpanel" aria-labelledby="Visão Geral">
-                    <div class="status-motor-container" style="display: none;">
-                        <i class="fas fa-power-off"></i> Status: <span id="info-status-motor"><i class='fas fa-circle status-off'></i> Desligado</span>
-                    </div>
-                    <div id="barraProgressoContainer" style="display: none;" class="velocimetro-container">
-                        <svg viewBox="0 0 120 120" class="velocimetro-svg" aria-label="Velocímetro">
-                            <title>Velocímetro</title>
-                            <path class="velocimetro-trilha" d="M 20 100 A 40 40 0 1 1 100 100" fill="none" />
-                            <path class="velocimetro-progresso" d="M 20 100 A 40 40 0 1 1 100 100" fill="none" />
-                        </svg>
-                        <div id="velocidadeAtual" class="velocimetro-texto">0 km/h</div>
-                    </div>
-                    <div id="info-especifica"></div>
-                    <div id="botoesAcoes" class="botoes-container">
-                        <button data-action="ligar" title="Ligar veículo" aria-label="Ligar veículo"><i class="fas fa-play"></i> Ligar</button>
-                        <button data-action="desligar" title="Desligar veículo" aria-label="Desligar veículo"><i class="fas fa-stop"></i> Desligar</button>
-                        <button data-action="acelerar" title="Acelerar veículo" aria-label="Acelerar veículo"><i class="fas fa-tachometer-alt"></i> Acelerar</button>
-                        <button data-action="frear" title="Frear veículo" aria-label="Frear veículo"><i class="fas fa-hand-paper"></i> Frear</button>
-                        <button data-action="ativarTurbo" id="botaoTurbo" class="botao-especial" title="Ativar Turbo Boost" aria-label="Ativar Turbo Boost"><i class="fas fa-rocket"></i> Boost</button>
-                        <button data-action="carregar" id="botaoCarregar" class="botao-especial" title="Carregar Caminhão" aria-label="Carregar Caminhão"><i class="fas fa-truck-loading"></i> Carregar</button>
-                        <button data-action="descarregar" id="botaoDescarregar" class="botao-especial" title="Descarregar Caminhão" aria-label="Descarregar Caminhão"><i class="fas fa-truck-moving"></i> Descarregar</button>
-                    </div>
-
-                    <!-- Seção Detalhes Extras (API Simulada Veículos) -->
-                    <div class="detalhes-extras-container">
-                        <button id="btnVerDetalhesExtras" class="botao-info" style="display: none;">
-                            <i class="fas fa-info-circle"></i> Ver Detalhes Extras (API Veículo)
-                        </button>
-                        <div id="detalhesExtrasVeiculo" class="detalhes-extras-resultado card-inner" style="display: none;">
-                            <!-- Conteúdo preenchido via JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Aba Manutenção -->
-                <div id="tab-manutencao" class="tab-content" role="tabpanel" aria-labelledby="Manutenção">
-                    <div id="formManutencaoContainer">
-                        <h3><i class="fas fa-calendar-plus"></i> Registrar / Agendar Manutenção</h3>
-                        <form id="formManutencao">
-                           <div>
-                               <label for="manutencaoDataHora"><i class="fas fa-calendar-alt"></i> Data e Hora:</label>
-                               <input type="datetime-local" id="manutencaoDataHora" required>
-                           </div>
-                           <div>
-                               <label for="manutencaoTipo"><i class="fas fa-tools"></i> Tipo:</label>
-                               <input type="text" id="manutencaoTipo" placeholder="Ex: Troca de óleo" required>
-                           </div>
-                           <div>
-                               <label for="manutencaoCusto"><i class="fas fa-dollar-sign"></i> Custo (R$):</label>
-                               <input type="text" id="manutencaoCusto" placeholder="Ex: 150,50 (Opcional)">
-                           </div>
-                           <div>
-                               <label for="manutencaoDescricao"><i class="fas fa-info-circle"></i> Descrição:</label>
-                               <input type="text" id="manutencaoDescricao" placeholder="Detalhes (Opcional)">
-                           </div>
-                           <button type="submit"><i class="fas fa-save"></i> Salvar Registro</button>
-                        </form>
-                    </div>
-                    <div class="manutencao-container">
-                        <div id="historicoManutencao" class="maintenance-list card-inner">
-                            <h3><i class="fas fa-history"></i> Histórico</h3>
-                            <ul class="lista-itens">
-                                <li class="placeholder">Nenhum registro de histórico encontrado.</li>
-                            </ul>
-                        </div>
-                        <div id="agendamentosFuturos" class="maintenance-list card-inner">
-                            <h3><i class="fas fa-calendar-check"></i> Agendamentos</h3>
-                            <ul class="lista-itens">
-                                <li class="placeholder">Nenhum agendamento encontrado.</li>
-                            </ul>
-                        </div>
-                   </div>
-                </div>
+          <!-- TAB: Histórico de Manutenção -->
+          <div id="vehicle-history-tab" class="tab-content">
+            <h3>Histórico de Manutenção para <span id="history-vehicle-model"></span></h3>
+            <div class="table-responsive">
+                <table id="maintenance-history-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo de Serviço</th>
+                            <th>KM na Manutenção</th>
+                            <th>Observações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Linhas do histórico serão inseridas aqui -->
+                    </tbody>
+                </table>
             </div>
+            <p id="no-maintenance-history" style="display:none;">Nenhum histórico de manutenção para este veículo.</p>
+          </div>
+        </section>
+      </main>
 
-            <div id="mensagem-selecione" style="display: block;" class="card">
-                <h2><i class="fas fa-info-circle"></i> Bem-vindo à Garagem V3!</h2>
-                <p>Adicione ou selecione um veículo para interagir.</p>
-                <p>Você também pode verificar a previsão do tempo abaixo.</p>
+      <!-- VIEW: Agendamentos -->
+      <main id="scheduling-view" class="view-section" style="display: none;">
+        <section id="add-appointment-panel">
+          <h2>Novo Agendamento</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="appointment-vehicle-selector">Veículo:</label>
+              <select id="appointment-vehicle-selector">
+                <option value="">-- Selecione um Veículo --</option>
+              </select>
             </div>
+            <div class="form-group">
+              <label for="appointment-date">Data:</label>
+              <input type="date" id="appointment-date" required>
+            </div>
+            <div class="form-group">
+              <label for="appointment-service-type">Tipo de Serviço:</label>
+              <input type="text" id="appointment-service-type" placeholder="Ex: Troca de Óleo, Revisão Completa" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="appointment-notes">Observações:</label>
+              <textarea id="appointment-notes" placeholder="Detalhes adicionais (opcional)"></textarea>
+            </div>
+          </div>
+          <button id="add-appointment-button">Agendar Manutenção</button>
+        </section>
 
-            <!-- NOVA SEÇÃO: Previsão do Tempo -->
-            <section id="secao-previsao-tempo" class="card">
-                <h2><i class="fas fa-cloud-sun"></i> Previsão do Tempo (5 Dias)</h2>
-                <div class="busca-container-tempo">
-                    <input type="text" id="cidade-input-tempo" placeholder="Digite o nome da cidade">
-                    <button id="verificar-clima-btn"><i class="fas fa-search"></i> Verificar</button>
-                </div>
-                <div id="status-mensagem-tempo" class="status-mensagem" aria-live="polite"></div>
-                <div id="previsao-tempo-resultado" class="previsao-resultado-container">
-                    <!-- Os resultados da previsão serão inseridos aqui -->
-                </div>
-            </section>
-            <!-- FIM NOVA SEÇÃO: Previsão do Tempo -->
+        <section id="appointments-list-panel">
+          <h2>Agendamentos Futuros e Passados</h2>
+          <div class="table-responsive">
+            <table id="appointments-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Veículo</th>
+                  <th>Serviço</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Linhas de agendamento aqui -->
+              </tbody>
+            </table>
+          </div>
+          <p id="no-appointments" style="display:none;">Nenhum agendamento encontrado.</p>
+        </section>
+      </main>
 
-        </main>
+    </div> <!-- Fim de main-content-area -->
+  </div> <!-- Fim de app-shell -->
+
+  <footer id="app-footer"> <!-- Adicionado ID para referência -->
+    <p>© 2024 Garagem Inteligente Pro Inc.</p>
+    <div id="notifications-area-footer" style="display: none;"> 
+        <!-- Notifications for small screens -->
     </div>
-
-    <!-- Modal Adicionar Veículo -->
-    <dialog id="modalAdicionarVeiculo">
-        <form id="formNovoVeiculo" novalidate>
-             <h2><i class="fas fa-plus-circle"></i> Adicionar Novo Veículo</h2>
-             <div>
-                 <label for="novoVeiculoTipo">Tipo:</label>
-                 <select id="novoVeiculoTipo" required>
-                     <option value="">-- Selecione --</option>
-                     <option value="Carro">Carro Normal</option>
-                     <option value="CarroEsportivo">Carro Esportivo</option>
-                     <option value="Caminhao">Caminhão</option>
-                 </select>
-             </div>
-             <div>
-                 <label for="novoVeiculoModelo">Modelo:</label>
-                 <input type="text" id="novoVeiculoModelo" required placeholder="Ex: Fusca, Ferrari, Scania">
-             </div>
-             <div>
-                 <label for="novoVeiculoCor">Cor:</label>
-                 <input type="text" id="novoVeiculoCor" required placeholder="Ex: Azul, Vermelho">
-             </div>
-             <div id="divCapacidadeCaminhao" style="display: none;">
-                 <label for="novoVeiculoCapacidade">Capacidade Carga (kg):</label>
-                 <input type="number" id="novoVeiculoCapacidade" min="1" placeholder="Ex: 10000">
-             </div>
-             <div class="modal-actions">
-                 <button type="submit"><i class="fas fa-save"></i> Adicionar</button>
-                 <button type="button" id="btnFecharModalAdicionar" class="botao-cancelar"><i class="fas fa-times"></i> Cancelar</button>
-             </div>
-        </form>
-    </dialog>
-
-    <script src="app.js"></script>
+  </footer>
+  <script src="script.js"></script>
+</body>
 </html>
