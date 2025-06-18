@@ -27,7 +27,24 @@
     <div id="main-content-area">
       <header id="main-header">
         <h1 id="current-view-title">Minha Garagem</h1>
+        
+        <!-- INÍCIO: Weather Widget -->
+        <div id="weather-widget" class="loading">
+          <div id="weather-main">
+            <img id="weather-icon" src="" alt="Ícone do tempo">
+            <span id="weather-temp">--°C</span>
+            <span id="weather-city">Carregando clima...</span>
+          </div>
+          <div id="weather-tip"></div>
+        </div>
+        <!-- FIM: Weather Widget -->
       </header>
+
+      <!-- INÍCIO: Painel de detalhes do clima (inicialmente oculto) -->
+      <div id="weather-details-panel" class="hidden">
+        <!-- A previsão detalhada será inserida aqui pelo JavaScript -->
+      </div>
+      <!-- FIM: Painel de detalhes do clima -->
 
       <!-- VIEW: Minha Garagem -->
       <main id="garage-view" class="view-section active">
@@ -179,7 +196,11 @@
     </div> <!-- Fim de main-content-area -->
   </div> <!-- Fim de app-shell -->
 
-  <footer id="app-footer"> <!-- Adicionado ID para referência -->
+  <footer id="app-footer">
+    <div id="settings-area">
+        <input type="text" id="owm-city" placeholder="Digite uma cidade...">
+        <button id="update-weather-button">Buscar / Atualizar</button>
+    </div>
     <p>© 2024 Garagem Inteligente Pro Inc.</p>
     <div id="notifications-area-footer" style="display: none;"> 
         <!-- Notifications for small screens -->

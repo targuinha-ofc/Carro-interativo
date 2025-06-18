@@ -5,6 +5,201 @@ const OIL_CHANGE_INTERVAL = 5000; // km
 const TIRE_CHECK_INTERVAL = 10000; // km
 const GENERAL_SERVICE_INTERVAL = 20000; // km
 
+// --- INÍCIO: Bloco de Integração com OpenWeatherMap (Compatível com API Gratuita) ---
+
+const weatherWidget = document.getElementById('weather-widget');
+const weatherDetailsPanel = document.getElementById('weather-details-panel');
+const userApiKey = 'e639aa9c6083d5cf4fa075d30beb4b54'; // Chave de API gratuita
+
+/**
+ * Busca as coordenadas (lat, lon) para um nome de cidade.
+ */
+async function getCoordsForCity(city, apiKey) {
+    const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${apiKey}`;
+    const response = await fetch(geoUrl);
+    if (!response.ok) throw new Error(`Não foi possível buscar as coordenadas. Status: ${response.status}`);
+    const data = await response.json();
+    if (data.length === 0) throw new Error(`Cidade "${city}" não encontrada.`);
+    return { lat: data[0].lat, lon: data[0].lon, name: data[0].name };
+}
+
+/**
+ * Busca os dados do CLIMA ATUAL usando as coordenadas (Endpoint Gratuito).
+ */
+async function fetchCurrentWeather(lat, lon, apiKey) {
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`;
+    const response = await fetch(weatherUrl);
+    if (!response.ok) throw new Error("Falha ao buscar o clima atual.");
+    return await response.json();
+}
+
+/**
+ * Busca os dados da PREVISÃO DE 5 DIAS usando as coordenadas (Endpoint Gratuito).
+ */
+async function fetchForecastData(lat, lon, apiKey) {
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`;
+    const response = await fetch(forecastUrl);
+    if (!response.ok) throw new Error("Falha ao buscar a previsão do tempo.");
+    return await response.json();
+}
+
+/**
+ * Atualiza o widget principal do clima.
+ */
+function updateWeatherWidgetUI(currentData) {
+    document.getElementById('weather-icon').src = `https://openweathermap.org/img/wn/${currentData.weather[0].icon}@2x.png`;
+    document.getElementById('weather-icon').alt = currentData.weather[0].description;
+    document.getElementById('weather-temp').textContent = `${Math.round(currentData.main.temp)}°C`;
+    document.getElementById('weather-city').textContent = currentData.name;
+
+    const weatherId = currentData.weather[0].id;
+    const tipElement = document.getElementById('weather-tip');
+    let tip = "";
+    if (weatherId >= 200 && weatherId < 600) tip = "Pista escorregadia. Reduza a velocidade.";
+    else if (weatherId >= 600 && weatherId < 700) tip = "Condições perigosas. Evite dirigir.";
+    else if (weatherId === 800 && new Date().getHours() > 18) tip = "Boa noite para um passeio!";
+    else if (currentData.main.temp < 5) tip = "Frio intenso! Verifique a pressão dos pneus.";
+    else if (currentData.main.temp > 30) tip = "Calor extremo! Verifique o sistema de arrefecimento.";
+    tipElement.textContent = tip;
+}
+
+/**
+ * Processa a lista de previsão de 3h e a transforma em uma previsão diária.
+ */
+function updateDetailedForecastUI(forecastData) {
+    const dailyForecasts = {};
+
+    forecastData.list.forEach(item => {
+        const date = new Date(item.dt * 1000).toISOString().split('T')[0];
+        if (!dailyForecasts[date]) {
+            dailyForecasts[date] = {
+                temps: [],
+                weathers: [],
+            };
+        }
+        dailyForecasts[date].temps.push(item.main.temp);
+        dailyForecasts[date].weathers.push(item.weather[0]);
+    });
+
+    let forecastHtml = '<h4>Previsão para os Próximos Dias</h4>';
+    Object.keys(dailyForecasts).slice(0, 5).forEach(dateStr => { // Mostra os próximos 5 dias disponíveis
+        const dayData = dailyForecasts[dateStr];
+        // Pula se for hoje e tiver poucos dados
+        if(new Date(dateStr).getDate() === new Date().getDate() && dayData.weathers.length < 4) return;
+
+        const date = new Date(dateStr + "T12:00:00");
+        const dayName = date.toLocaleDateString('pt-BR', { weekday: 'long' });
+        
+        const temp_max = Math.round(Math.max(...dayData.temps));
+        const temp_min = Math.round(Math.min(...dayData.temps));
+        const representativeWeather = dayData.weathers[Math.floor(dayData.weathers.length / 2)];
+
+        forecastHtml += `
+            <div class="forecast-day">
+                <span class="day-name">${dayName}</span>
+                <img src="https://openweathermap.org/img/wn/${representativeWeather.icon}.png" alt="${representativeWeather.description}">
+                <span class="description">${representativeWeather.description}</span>
+                <span class="temp-range">
+                    <span class="temp-max">${temp_max}°</span> / 
+                    <span class="temp-min">${temp_min}°</span>
+                </span>
+            </div>`;
+    });
+    
+    weatherDetailsPanel.innerHTML = forecastHtml;
+}
+
+/**
+ * Orquestrador principal: busca os dados e atualiza a UI.
+ */
+async function fetchAndDisplayWeather(lat, lon, apiKey) {
+    weatherWidget.classList.add('loading');
+    document.getElementById('weather-city').textContent = 'Atualizando...';
+    try {
+        const [currentData, forecastData] = await Promise.all([
+            fetchCurrentWeather(lat, lon, apiKey),
+            fetchForecastData(lat, lon, apiKey)
+        ]);
+
+        updateWeatherWidgetUI(currentData);
+        updateDetailedForecastUI(forecastData);
+
+        // ATUALIZA O CACHE com a cidade buscada com sucesso.
+        localStorage.setItem('weatherCache', JSON.stringify({ lat, lon, city: currentData.name }));
+        document.getElementById('owm-city').value = currentData.name;
+
+    } catch (error) {
+        showNotification(error.message, 'error');
+        document.getElementById('weather-city').textContent = 'Falha ao carregar';
+        console.error("Erro no clima:", error);
+    } finally {
+        weatherWidget.classList.remove('loading');
+    }
+}
+
+/**
+ * Inicia a busca pelo clima a partir de um nome de cidade do campo de input.
+ */
+async function loadWeatherByCityName() {
+    const city = document.getElementById('owm-city').value.trim();
+    if (!city) {
+        showNotification("Por favor, digite o nome de uma cidade.", 'warning');
+        return;
+    }
+    weatherWidget.classList.add('loading');
+    document.getElementById('weather-city').textContent = `Buscando ${city}...`;
+    try {
+        const coords = await getCoordsForCity(city, userApiKey);
+        await fetchAndDisplayWeather(coords.lat, coords.lon, userApiKey);
+    } catch (error) {
+        showNotification(error.message, 'error');
+        weatherWidget.classList.remove('loading');
+        document.getElementById('weather-city').textContent = 'Falha ao carregar';
+        console.error(`Erro ao buscar por "${city}":`, error);
+    }
+}
+
+/**
+ * Tenta obter o clima usando a geolocalização do navegador.
+ */
+function getWeatherByGeolocation() {
+    if (!navigator.geolocation) {
+        showNotification("Geolocalização não é suportada. Buscando clima para São Paulo.", 'warning');
+        loadWeatherByCityNameFromText("São Paulo"); // Função auxiliar para evitar conflito com input
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            fetchAndDisplayWeather(position.coords.latitude, position.coords.longitude, userApiKey);
+        },
+        (error) => {
+            console.warn("Erro de Geolocalização:", error.message);
+            showNotification("Acesso à localização negado. Buscando clima de São Paulo.", 'info');
+            loadWeatherByCityNameFromText("São Paulo"); // Função auxiliar para evitar conflito com input
+        }
+    );
+}
+
+// Função auxiliar para fallbacks, não lê o input
+async function loadWeatherByCityNameFromText(city) {
+    try {
+        const coords = await getCoordsForCity(city, userApiKey);
+        await fetchAndDisplayWeather(coords.lat, coords.lon, userApiKey);
+    } catch (error) {
+        console.error(`Falha no fallback para "${city}":`, error);
+        document.getElementById('weather-city').textContent = 'Erro de fallback';
+    }
+}
+
+
+// Event Listeners para o clima
+weatherWidget.addEventListener('click', () => weatherDetailsPanel.classList.toggle('hidden'));
+document.getElementById('update-weather-button').addEventListener('click', loadWeatherByCityName);
+
+// --- FIM: Bloco de Integração com OpenWeatherMap ---
+
+
 // --- Utility for unique IDs ---
 let nextVehicleId = 1;
 let nextAppointmentId = 1;
@@ -19,18 +214,15 @@ function showNotification(message, type = 'info') {
     const notif = document.createElement('p');
     notif.textContent = message;
     notif.className = `notification ${type}`;
-
-    // Determina onde adicionar a notificação com base na largura da tela
     const targetArea = window.innerWidth <= 768 ? notificationsAreaFooter : notificationsAreaSidebar;
     targetArea.appendChild(notif);
-    targetArea.style.display = 'flex'; // Garante que a área do footer seja visível
-
+    targetArea.style.display = 'flex';
     setTimeout(() => {
         notif.classList.add('fade-out');
         const removeNotif = () => {
             notif.remove();
             if (targetArea.childElementCount === 0 && targetArea === notificationsAreaFooter) {
-                targetArea.style.display = 'none'; // Esconde a área do footer se vazia
+                targetArea.style.display = 'none';
             }
         };
         notif.addEventListener('transitionend', removeNotif, { once: true });
@@ -38,16 +230,8 @@ function showNotification(message, type = 'info') {
     }, type === 'error' ? 7000 : (type === 'warning' ? 5000 : 4000));
 }
 
-
 // --- Classe Agendamento ---
 class Agendamento {
-    /**
-     * @param {number} idVeiculo - ID do Veiculo associado.
-     * @param {string} nomeVeiculo - Modelo do veículo para exibição.
-     * @param {string} dataAgendamento - Data do agendamento (string YYYY-MM-DD).
-     * @param {string} tipoServico - Descrição do serviço.
-     * @param {string} [observacoes=''] - Notas adicionais.
-     */
     constructor(idVeiculo, nomeVeiculo, dataAgendamento, tipoServico, observacoes = '') {
         if (!idVeiculo || !dataAgendamento || !tipoServico) {
             throw new Error("ID do veículo, data e tipo de serviço são obrigatórios para agendamento.");
@@ -55,12 +239,11 @@ class Agendamento {
         this.id = generateAppointmentId();
         this.idVeiculo = idVeiculo;
         this.nomeVeiculo = nomeVeiculo;
-        this.dataAgendamento = new Date(dataAgendamento + "T00:00:00").toISOString(); // Adiciona hora para evitar problemas de fuso no toISOString
+        this.dataAgendamento = new Date(dataAgendamento + "T00:00:00").toISOString();
         this.tipoServico = tipoServico;
         this.observacoes = observacoes;
-        this.status = "Agendado"; // "Agendado", "Concluído", "Cancelado"
+        this.status = "Agendado";
     }
-
     get dataFormatada() {
         return new Date(this.dataAgendamento).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
     }
@@ -164,7 +347,7 @@ class Veiculo {
         item.ultimaKm = this.kmRodados; item.proximaKm = this.kmRodados + interval; item.status = "OK";
         showNotification(`${itemName} para ${this.modelo} realizada.`, 'success');
         this.adicionarRegistroHistorico(serviceDesc, `Realizado em ${this.kmRodados.toFixed(0)} km`);
-        this.verificarManutencao(); this.atualizarDisplayCompleto(); // Garagem saveToLocalStorage é chamado aqui
+        this.verificarManutencao(); this.atualizarDisplayCompleto();
     }
 
     realizarTrocaOleo() { this.realizarManutencaoItem('oleo', OIL_CHANGE_INTERVAL, 'Troca de óleo'); }
@@ -176,7 +359,7 @@ class Veiculo {
             this.manutencao[key].proximaKm = this.kmRodados + (key === 'oleo' ? OIL_CHANGE_INTERVAL : TIRE_CHECK_INTERVAL);
         });
         this.adicionarRegistroHistorico('Revisão Geral Completa', `Serviços de óleo e pneus incluídos/verificados.`);
-        this.verificarManutencao(); this.atualizarDisplayCompleto(); // Garagem saveToLocalStorage é chamado aqui
+        this.verificarManutencao(); this.atualizarDisplayCompleto();
     }
 
     getInformacoesBase() { return `<strong>Modelo:</strong> ${this.modelo}, <strong>Cor:</strong> ${this.cor}`; }
@@ -192,18 +375,15 @@ class Veiculo {
             document.getElementById('vehicle-speed').innerHTML = `<strong>Velocidade:</strong> ${this.velocidade} km/h`;
             document.getElementById('vehicle-info-specific').innerHTML = this.getInformacoesEspecificas();
             document.getElementById('km-driven').textContent = this.kmRodados.toFixed(0);
-
             const formatStatus = (s) => `<span class="status-badge status-${s.toLowerCase()}">${s}</span>`;
             let maint = `<strong>Óleo:</strong> ${formatStatus(this.manutencao.oleo.status)} (Próx.: ${this.manutencao.oleo.proximaKm.toFixed(0)} km) <br>`;
             maint += `<strong>Pneus:</strong> ${formatStatus(this.manutencao.pneus.status)} (Próx.: ${this.manutencao.pneus.proximaKm.toFixed(0)} km) <br>`;
             maint += `<strong>Revisão:</strong> ${formatStatus(this.manutencao.revisaoGeral.status)} (Próx.: ${this.manutencao.revisaoGeral.proximaKm.toFixed(0)} km)`;
             document.getElementById('maintenance-status-report').innerHTML = maint;
-
             document.querySelector('[data-action="ativarTurbo"]').style.display = (this instanceof CarroEsportivo) ? 'inline-flex' : 'none';
             document.querySelector('[data-action="desativarTurbo"]').style.display = (this instanceof CarroEsportivo) ? 'inline-flex' : 'none';
             document.getElementById('truck-load-actions').style.display = (this instanceof Caminhao) ? 'flex' : 'none';
-            
-            renderMaintenanceHistory(this); // Atualiza a aba de histórico
+            renderMaintenanceHistory(this);
         }
         garagem.saveToLocalStorage();
     }
@@ -222,7 +402,7 @@ class CarroEsportivo extends Veiculo {
         if (this.turboAtivado) { showNotification(`Turbo já está ativado.`, 'warning'); return; }
         this.turboAtivado = true; this.sounds.turbo?.play();
         showNotification(`Turbo ativado para ${this.modelo}!`, 'success');
-        this.acelerar(20); // Boost
+        this.acelerar(20);
         this.atualizarDisplayCompleto();
     }
     desativarTurbo() {
@@ -276,16 +456,14 @@ class Garagem {
         this.veiculoSelecionado = null;
         this.loadFromLocalStorage();
     }
-
     adicionarVeiculo(veiculo) {
         this.veiculos.push(veiculo);
         showNotification(`${veiculo.constructor.name.replace(/([A-Z])/g, ' $1').trim()} ${veiculo.modelo} adicionado.`, 'success');
         this.atualizarSeletorVeiculos();
         updateAppointmentVehicleSelector();
-        document.getElementById('vehicle-selector').value = veiculo.id; // Auto-select
-        this.selecionarVeiculo(veiculo.id); // Calls save
+        document.getElementById('vehicle-selector').value = veiculo.id;
+        this.selecionarVeiculo(veiculo.id);
     }
-
     removerVeiculo(idVeiculo) {
         const idNum = parseInt(idVeiculo, 10);
         const index = this.veiculos.findIndex(v => v.id === idNum);
@@ -298,18 +476,16 @@ class Garagem {
                 document.getElementById('selected-vehicle-panel').style.display = 'none';
                 document.getElementById('vehicle-selector').value = "";
             }
-            this.agendamentos = this.agendamentos.filter(ag => ag.idVeiculo !== idNum); // Remove appointments for this vehicle
+            this.agendamentos = this.agendamentos.filter(ag => ag.idVeiculo !== idNum);
             this.atualizarSeletorVeiculos();
             updateAppointmentVehicleSelector();
             renderAppointmentsTable();
             this.saveToLocalStorage();
         } else showNotification("Veículo não encontrado para remoção.", 'error');
     }
-
     selecionarVeiculo(idVeiculo) {
         const idNum = parseInt(idVeiculo, 10);
         this.veiculoSelecionado?.id !== idNum && this.veiculoSelecionado?.pararTodosOsSons();
-
         if (!idNum) {
             this.veiculoSelecionado = null;
             document.getElementById('selected-vehicle-panel').style.display = 'none';
@@ -319,16 +495,15 @@ class Garagem {
             if (this.veiculoSelecionado) {
                 document.getElementById('selected-vehicle-panel').style.display = 'block';
                 document.getElementById('remove-vehicle-button').disabled = false;
-                this.veiculoSelecionado.atualizarDisplayCompleto(); // Calls save indirectly
-                switchVehicleDetailTab('details'); // Default to details tab
+                this.veiculoSelecionado.atualizarDisplayCompleto();
+                switchVehicleDetailTab('details');
             } else {
                 document.getElementById('selected-vehicle-panel').style.display = 'none';
                 document.getElementById('remove-vehicle-button').disabled = true;
             }
         }
-        this.saveToLocalStorage(); // Save selection state
+        this.saveToLocalStorage();
     }
-
     atualizarSeletorVeiculos() {
         const selector = document.getElementById('vehicle-selector');
         const currentVal = selector.value;
@@ -342,7 +517,6 @@ class Garagem {
         selector.value = this.veiculos.find(v => v.id.toString() === currentVal) ? currentVal : "";
         document.getElementById('remove-vehicle-button').disabled = !selector.value;
     }
-
     adicionarAgendamento(agendamento) {
         this.agendamentos.push(agendamento);
         this.agendamentos.sort((a, b) => new Date(a.dataAgendamento) - new Date(b.dataAgendamento));
@@ -350,7 +524,6 @@ class Garagem {
         renderAppointmentsTable();
         this.saveToLocalStorage();
     }
-
     atualizarStatusAgendamento(idAgendamento, novoStatus) {
         const ag = this.agendamentos.find(a => a.id === idAgendamento);
         if (ag) {
@@ -358,17 +531,13 @@ class Garagem {
             showNotification(`Agendamento para ${ag.nomeVeiculo} ${novoStatus.toLowerCase()}.`, 'info');
             if (novoStatus === "Concluído") {
                 const veiculo = this.veiculos.find(v => v.id === ag.idVeiculo);
-                veiculo?.adicionarRegistroHistorico(
-                    `Serviço Agendado: ${ag.tipoServico}`,
-                    `Realizado conforme agendamento. Observações: ${ag.observacoes || 'Nenhuma'}`
-                );
-                veiculo?.atualizarDisplayCompleto(); // To refresh history if vehicle is selected
+                veiculo?.adicionarRegistroHistorico(`Serviço Agendado: ${ag.tipoServico}`, `Realizado conforme agendamento. Observações: ${ag.observacoes || 'Nenhuma'}`);
+                veiculo?.atualizarDisplayCompleto();
             }
             renderAppointmentsTable();
             this.saveToLocalStorage();
         }
     }
-    
     removerAgendamento(idAgendamento) {
         const index = this.agendamentos.findIndex(ag => ag.id === idAgendamento);
         if (index > -1) {
@@ -378,8 +547,22 @@ class Garagem {
             this.saveToLocalStorage();
         }
     }
-
-
+    registrarServicoConcluido(veiculo, tipoServico) {
+        if (!veiculo || !tipoServico) return;
+        const dataHoje = new Date().toISOString().split('T')[0];
+        try {
+            const novoAgendamento = new Agendamento(veiculo.id, veiculo.modelo, dataHoje, tipoServico, "Serviço realizado imediatamente via painel da garagem.");
+            novoAgendamento.status = "Concluído";
+            this.agendamentos.push(novoAgendamento);
+            this.agendamentos.sort((a, b) => new Date(a.dataAgendamento) - new Date(b.dataAgendamento));
+            showNotification(`Registro de '${tipoServico}' adicionado ao histórico de agendamentos.`, 'info');
+            renderAppointmentsTable();
+            this.saveToLocalStorage();
+        } catch (err) {
+            console.error("Erro ao registrar serviço concluído:", err);
+            showNotification("Não foi possível registrar o serviço no histórico.", 'error');
+        }
+    }
     saveToLocalStorage() {
         const serializableVeiculos = this.veiculos.map(v => ({
             type: v.constructor.name, id: v.id, modelo: v.modelo, cor: v.cor, imagemURL: v.imagemURL,
@@ -394,11 +577,9 @@ class Garagem {
         localStorage.setItem('nextAppointmentId', nextAppointmentId.toString());
         localStorage.setItem('selectedVehicleId', this.veiculoSelecionado ? this.veiculoSelecionado.id.toString() : "");
     }
-
     loadFromLocalStorage() {
         nextVehicleId = parseInt(localStorage.getItem('nextVehicleId'), 10) || 1;
         nextAppointmentId = parseInt(localStorage.getItem('nextAppointmentId'), 10) || 1;
-        
         const storedVeiculos = JSON.parse(localStorage.getItem('garagemVeiculos') || '[]');
         this.veiculos = storedVeiculos.map(data => {
             let veiculo;
@@ -411,19 +592,16 @@ class Garagem {
             veiculo.verificarManutencao();
             return veiculo;
         });
-
         const storedAgendamentos = JSON.parse(localStorage.getItem('garagemAgendamentos') || '[]');
         this.agendamentos = storedAgendamentos.map(data => {
             const ag = new Agendamento(data.idVeiculo, data.nomeVeiculo, new Date(data.dataAgendamento).toISOString().split('T')[0], data.tipoServico, data.observacoes);
             Object.assign(ag, { id: data.id, status: data.status });
             return ag;
         }).sort((a, b) => new Date(a.dataAgendamento) - new Date(b.dataAgendamento));
-        
         const selectedId = localStorage.getItem('selectedVehicleId');
         if (selectedId) this.veiculoSelecionado = this.veiculos.find(v => v.id.toString() === selectedId) || null;
     }
 }
-
 const garagem = new Garagem();
 
 // --- Gerenciamento de Views e Abas ---
@@ -449,7 +627,6 @@ function switchVehicleDetailTab(tabId) {
     vehicleTabButtons.forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
 }
 vehicleTabButtons.forEach(b => b.addEventListener('click', e => switchVehicleDetailTab(e.currentTarget.dataset.tab)));
-
 
 // --- Funções de Renderização para Histórico e Agendamentos ---
 function renderMaintenanceHistory(veiculo) {
@@ -514,6 +691,15 @@ function renderAppointmentsTable() {
 
 // --- DOM Event Listeners ---
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Lógica de Inicialização do Clima ---
+    const weatherCache = JSON.parse(localStorage.getItem('weatherCache') || 'null');
+    if (weatherCache && weatherCache.lat && weatherCache.lon) {
+        fetchAndDisplayWeather(weatherCache.lat, weatherCache.lon, userApiKey);
+    } else {
+        getWeatherByGeolocation();
+    }
+
+    // --- Restante da inicialização da página ---
     const vehicleTypeSelector = document.getElementById('vehicle-type-selector');
     const newTruckCapacityInput = document.getElementById('new-truck-capacity');
     const addVehicleButton = document.getElementById('add-vehicle-button');
@@ -525,10 +711,10 @@ document.addEventListener('DOMContentLoaded', () => {
     garagem.atualizarSeletorVeiculos();
     updateAppointmentVehicleSelector();
     renderAppointmentsTable();
-    switchView('garage-view'); // Start on garage view
+    switchView('garage-view');
     if (garagem.veiculoSelecionado) {
         vehicleSelectorDropdown.value = garagem.veiculoSelecionado.id;
-        garagem.selecionarVeiculo(garagem.veiculoSelecionado.id); // Re-select and display
+        garagem.selecionarVeiculo(garagem.veiculoSelecionado.id);
     } else {
         document.getElementById('selected-vehicle-panel').style.display = 'none';
     }
@@ -567,13 +753,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const acao = e.target.dataset.action;
             const v = garagem.veiculoSelecionado;
             try {
-                if (typeof v[acao] === 'function') v[acao]();
-                else if (acao === 'carregar' || acao === 'descarregar') {
+                if (typeof v[acao] === 'function') {
+                    v[acao]();
+                } else if (acao === 'carregar' || acao === 'descarregar') {
                     const peso = document.getElementById('truck-cargo-weight').value;
                     v[acao](peso); document.getElementById('truck-cargo-weight').value = '';
                 } else if (acao.startsWith('service')) {
-                    const serviceMap = { serviceOil: 'realizarTrocaOleo', serviceTires: 'verificarPneus', serviceGeneral: 'realizarRevisaoGeral' };
-                    if (serviceMap[acao]) v[serviceMap[acao]]();
+                    const serviceMap = {
+                        serviceOil: { method: 'realizarTrocaOleo', name: 'Troca de Óleo' },
+                        serviceTires: { method: 'verificarPneus', name: 'Verificação/Rodízio de Pneus' },
+                        serviceGeneral: { method: 'realizarRevisaoGeral', name: 'Revisão Geral Completa' }
+                    };
+                    const serviceInfo = serviceMap[acao];
+                    if (serviceInfo && typeof v[serviceInfo.method] === 'function') {
+                        v[serviceInfo.method]();
+                        garagem.registrarServicoConcluido(v, serviceInfo.name);
+                    }
                 }
             } catch (err) { showNotification(`Erro: ${err.message}`, 'error'); console.error(err); }
         }
@@ -584,13 +779,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = document.getElementById('appointment-date').value;
         const type = document.getElementById('appointment-service-type').value.trim();
         const notes = document.getElementById('appointment-notes').value.trim();
-
         if (!vehId || !date || !type) { showNotification("Veículo, data e tipo de serviço são obrigatórios.", 'error'); return; }
         if (new Date(date + "T00:00:00") < new Date().setHours(0,0,0,0) && !confirm("A data é no passado. Continuar?")) { showNotification("Agendamento não criado.", 'warning'); return; }
-        
         const veiculo = garagem.veiculos.find(v => v.id === vehId);
         if (!veiculo) { showNotification("Veículo do agendamento não encontrado.", 'error'); return; }
-
         try {
             garagem.adicionarAgendamento(new Agendamento(vehId, veiculo.modelo, date, type, notes));
             ['appointment-vehicle-selector', 'appointment-date', 'appointment-service-type', 'appointment-notes'].forEach(id => document.getElementById(id).value = '');

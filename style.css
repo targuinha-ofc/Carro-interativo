@@ -372,12 +372,15 @@ textarea { min-height: 80px; font-family: var(--font-family-sans-serif); }
 
 /* --- Footer --- */
 #app-footer {
-    text-align: center;
-    padding: 15px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    height: auto;
     background-color: var(--text-dark);
     color: var(--bg-light);
     font-size: 0.9em;
-    height: var(--footer-height);
     flex-shrink: 0; /* Previne que o footer encolha */
 }
 #notifications-area-footer { /* Para telas pequenas, se movido para cá */
@@ -456,4 +459,155 @@ textarea { min-height: 80px; font-family: var(--font-family-sans-serif); }
     button { padding: 10px 15px; font-size: 0.95em; }
     input[type="text"], input[type="number"], input[type="date"], select, textarea { padding: 10px 12px; }
     .vehicle-view-tabs .tab-button { font-size: 0.85em; padding: 7px 8px;}
+}
+
+
+/* --- Estilos para Integração OpenWeatherMap --- */
+
+/* Widget principal no Header */
+#main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative; /* Para o painel de detalhes */
+}
+
+#weather-widget {
+    cursor: pointer;
+    padding: 5px 15px;
+    border-radius: var(--border-radius);
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s;
+    text-align: right;
+}
+
+#weather-widget:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+#weather-widget.loading #weather-main {
+    opacity: 0.6;
+}
+
+#weather-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#weather-icon {
+    width: 45px;
+    height: 45px;
+}
+
+#weather-temp {
+    font-size: 1.8em;
+    font-weight: 500;
+}
+
+#weather-city {
+    font-size: 1em;
+    font-weight: 300;
+}
+
+#weather-tip {
+    font-size: 0.85em;
+    font-style: italic;
+    margin-top: 4px;
+    opacity: 0.9;
+}
+
+/* Painel de previsão detalhada */
+#weather-details-panel {
+    position: absolute;
+    top: 100%; /* Abaixo do header */
+    right: 30px; /* Alinhado com o padding da view */
+    background: white;
+    box-shadow: var(--box-shadow);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    z-index: 100;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform-origin: top center;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#weather-details-panel.hidden {
+    transform: scaleY(0) translateY(-20px);
+    opacity: 0;
+    max-height: 0;
+    padding: 0 15px;
+    pointer-events: none; /* Impede interação quando oculto */
+}
+
+.forecast-day {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-medium);
+}
+.forecast-day:last-child {
+    border-bottom: none;
+}
+.forecast-day .day-name { font-weight: bold; width: 100px; }
+.forecast-day img { width: 40px; height: 40px; }
+.forecast-day .description { flex-grow: 1; text-transform: capitalize; }
+.forecast-day .temp-range { font-weight: 500; text-align: right; }
+.forecast-day .temp-max { color: var(--error-color); }
+.forecast-day .temp-min { color: var(--primary-color); }
+
+/* Área de configurações no footer */
+#settings-area {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#settings-area input {
+    background-color: #495057;
+    color: white;
+    border-color: #6C757D;
+    max-width: 250px;
+}
+#settings-area button {
+    background-color: var(--secondary-color);
+    color: var(--text-dark);
+}
+
+/* Responsividade para o clima */
+@media (max-width: 768px) {
+    #main-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    #weather-widget {
+        width: 100%;
+        text-align: center;
+    }
+    #weather-main {
+        justify-content: center;
+    }
+    #weather-details-panel {
+        right: 15px;
+        left: 15px;
+        width: auto;
+    }
+    #settings-area {
+        flex-direction: column;
+        width: 90%;
+    }
+    #settings-area input, #settings-area button {
+        width: 100%;
+        max-width: none;
+    }
 }
