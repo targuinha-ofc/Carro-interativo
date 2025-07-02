@@ -4,7 +4,7 @@
 // !! IMPORTANTE !!
 // Após publicar seu backend no Render.com, troque esta URL pela sua URL pública.
 // Para testar localmente, mantenha como está.
-const BACKEND_URL = 'http://localhost:3001'; 
+const BACKEND_URL = 'https://carro-interativo-ylna.onrender.com'; 
 // Exemplo após deploy: const BACKEND_URL = 'https://garagem-pro-backend-xyz.onrender.com';
 // ======================================================================================
 
