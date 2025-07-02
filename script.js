@@ -1,47 +1,18 @@
-// script.js - Garagem Inteligente Pro
+// script.js - Garagem Inteligente Pro (Versão com Backend)
 
-// --- Constants for Maintenance ---
-const OIL_CHANGE_INTERVAL = 5000; // km
-const TIRE_CHECK_INTERVAL = 10000; // km
-const GENERAL_SERVICE_INTERVAL = 20000; // km
+// ======================================================================================
+// !! IMPORTANTE !!
+// Após publicar seu backend no Render.com, troque esta URL pela sua URL pública.
+// Para testar localmente, mantenha como está.
+const BACKEND_URL = 'http://localhost:3001'; 
+// Exemplo após deploy: const BACKEND_URL = 'https://garagem-pro-backend-xyz.onrender.com';
+// ======================================================================================
 
-// --- INÍCIO: Bloco de Integração com OpenWeatherMap (Compatível com API Gratuita) ---
+
+// --- INÍCIO: NOVO Bloco de Integração com o Backend ---
 
 const weatherWidget = document.getElementById('weather-widget');
 const weatherDetailsPanel = document.getElementById('weather-details-panel');
-const userApiKey = 'e639aa9c6083d5cf4fa075d30beb4b54'; // Chave de API gratuita
-
-/**
- * Busca as coordenadas (lat, lon) para um nome de cidade.
- */
-async function getCoordsForCity(city, apiKey) {
-    const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${apiKey}`;
-    const response = await fetch(geoUrl);
-    if (!response.ok) throw new Error(`Não foi possível buscar as coordenadas. Status: ${response.status}`);
-    const data = await response.json();
-    if (data.length === 0) throw new Error(`Cidade "${city}" não encontrada.`);
-    return { lat: data[0].lat, lon: data[0].lon, name: data[0].name };
-}
-
-/**
- * Busca os dados do CLIMA ATUAL usando as coordenadas (Endpoint Gratuito).
- */
-async function fetchCurrentWeather(lat, lon, apiKey) {
-    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`;
-    const response = await fetch(weatherUrl);
-    if (!response.ok) throw new Error("Falha ao buscar o clima atual.");
-    return await response.json();
-}
-
-/**
- * Busca os dados da PREVISÃO DE 5 DIAS usando as coordenadas (Endpoint Gratuito).
- */
-async function fetchForecastData(lat, lon, apiKey) {
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`;
-    const response = await fetch(forecastUrl);
-    if (!response.ok) throw new Error("Falha ao buscar a previsão do tempo.");
-    return await response.json();
-}
 
 /**
  * Atualiza o widget principal do clima.
@@ -51,7 +22,6 @@ function updateWeatherWidgetUI(currentData) {
     document.getElementById('weather-icon').alt = currentData.weather[0].description;
     document.getElementById('weather-temp').textContent = `${Math.round(currentData.main.temp)}°C`;
     document.getElementById('weather-city').textContent = currentData.name;
-
     const weatherId = currentData.weather[0].id;
     const tipElement = document.getElementById('weather-tip');
     let tip = "";
@@ -64,141 +34,113 @@ function updateWeatherWidgetUI(currentData) {
 }
 
 /**
- * Processa a lista de previsão de 3h e a transforma em uma previsão diária.
+ * Processa a lista de previsão e a transforma em uma previsão diária.
  */
 function updateDetailedForecastUI(forecastData) {
     const dailyForecasts = {};
-
     forecastData.list.forEach(item => {
         const date = new Date(item.dt * 1000).toISOString().split('T')[0];
         if (!dailyForecasts[date]) {
-            dailyForecasts[date] = {
-                temps: [],
-                weathers: [],
-            };
+            dailyForecasts[date] = { temps: [], weathers: [] };
         }
         dailyForecasts[date].temps.push(item.main.temp);
         dailyForecasts[date].weathers.push(item.weather[0]);
     });
-
     let forecastHtml = '<h4>Previsão para os Próximos Dias</h4>';
-    Object.keys(dailyForecasts).slice(0, 5).forEach(dateStr => { // Mostra os próximos 5 dias disponíveis
+    Object.keys(dailyForecasts).slice(0, 5).forEach(dateStr => {
         const dayData = dailyForecasts[dateStr];
-        // Pula se for hoje e tiver poucos dados
         if(new Date(dateStr).getDate() === new Date().getDate() && dayData.weathers.length < 4) return;
-
         const date = new Date(dateStr + "T12:00:00");
         const dayName = date.toLocaleDateString('pt-BR', { weekday: 'long' });
-        
         const temp_max = Math.round(Math.max(...dayData.temps));
         const temp_min = Math.round(Math.min(...dayData.temps));
         const representativeWeather = dayData.weathers[Math.floor(dayData.weathers.length / 2)];
-
         forecastHtml += `
             <div class="forecast-day">
                 <span class="day-name">${dayName}</span>
                 <img src="https://openweathermap.org/img/wn/${representativeWeather.icon}.png" alt="${representativeWeather.description}">
                 <span class="description">${representativeWeather.description}</span>
                 <span class="temp-range">
-                    <span class="temp-max">${temp_max}°</span> / 
-                    <span class="temp-min">${temp_min}°</span>
+                    <span class="temp-max">${temp_max}°</span> / <span class="temp-min">${temp_min}°</span>
                 </span>
             </div>`;
     });
-    
     weatherDetailsPanel.innerHTML = forecastHtml;
 }
 
 /**
- * Orquestrador principal: busca os dados e atualiza a UI.
+ * Orquestrador principal: busca os dados do NOSSO BACKEND e atualiza a UI.
+ * @param {object} params - Objeto com 'lat' e 'lon' OU 'city'.
  */
-async function fetchAndDisplayWeather(lat, lon, apiKey) {
+async function fetchWeatherFromBackend(params) {
     weatherWidget.classList.add('loading');
-    document.getElementById('weather-city').textContent = 'Atualizando...';
+    
+    const queryString = new URLSearchParams(params).toString();
+    const url = `${BACKEND_URL}/api/weather?${queryString}`;
+
     try {
-        const [currentData, forecastData] = await Promise.all([
-            fetchCurrentWeather(lat, lon, apiKey),
-            fetchForecastData(lat, lon, apiKey)
-        ]);
+        const response = await fetch(url);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Erro do servidor: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        updateWeatherWidgetUI(data.current);
+        updateDetailedForecastUI(data.forecast);
 
-        updateWeatherWidgetUI(currentData);
-        updateDetailedForecastUI(forecastData);
-
-        // ATUALIZA O CACHE com a cidade buscada com sucesso.
-        localStorage.setItem('weatherCache', JSON.stringify({ lat, lon, city: currentData.name }));
-        document.getElementById('owm-city').value = currentData.name;
+        localStorage.setItem('weatherCache', JSON.stringify({ lat: data.current.coord.lat, lon: data.current.coord.lon, city: data.current.name }));
+        document.getElementById('owm-city').value = data.current.name;
 
     } catch (error) {
         showNotification(error.message, 'error');
         document.getElementById('weather-city').textContent = 'Falha ao carregar';
-        console.error("Erro no clima:", error);
+        console.error("Erro ao buscar dados do backend:", error);
     } finally {
         weatherWidget.classList.remove('loading');
     }
 }
 
-/**
- * Inicia a busca pelo clima a partir de um nome de cidade do campo de input.
- */
-async function loadWeatherByCityName() {
+// --- Funções de gatilho que chamam o orquestrador ---
+
+function getWeatherByGeolocation() {
+    if (!navigator.geolocation) {
+        showNotification("Geolocalização não suportada. Buscando por São Paulo.", 'warning');
+        fetchWeatherFromBackend({ city: 'São Paulo' });
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(
+        (position) => fetchWeatherFromBackend({ lat: position.coords.latitude, lon: position.coords.longitude }),
+        () => {
+            showNotification("Acesso à localização negado. Buscando por São Paulo.", 'info');
+            fetchWeatherFromBackend({ city: 'São Paulo' });
+        }
+    );
+}
+
+function loadWeatherByCityName() {
     const city = document.getElementById('owm-city').value.trim();
     if (!city) {
         showNotification("Por favor, digite o nome de uma cidade.", 'warning');
         return;
     }
-    weatherWidget.classList.add('loading');
     document.getElementById('weather-city').textContent = `Buscando ${city}...`;
-    try {
-        const coords = await getCoordsForCity(city, userApiKey);
-        await fetchAndDisplayWeather(coords.lat, coords.lon, userApiKey);
-    } catch (error) {
-        showNotification(error.message, 'error');
-        weatherWidget.classList.remove('loading');
-        document.getElementById('weather-city').textContent = 'Falha ao carregar';
-        console.error(`Erro ao buscar por "${city}":`, error);
-    }
+    fetchWeatherFromBackend({ city });
 }
-
-/**
- * Tenta obter o clima usando a geolocalização do navegador.
- */
-function getWeatherByGeolocation() {
-    if (!navigator.geolocation) {
-        showNotification("Geolocalização não é suportada. Buscando clima para São Paulo.", 'warning');
-        loadWeatherByCityNameFromText("São Paulo"); // Função auxiliar para evitar conflito com input
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            fetchAndDisplayWeather(position.coords.latitude, position.coords.longitude, userApiKey);
-        },
-        (error) => {
-            console.warn("Erro de Geolocalização:", error.message);
-            showNotification("Acesso à localização negado. Buscando clima de São Paulo.", 'info');
-            loadWeatherByCityNameFromText("São Paulo"); // Função auxiliar para evitar conflito com input
-        }
-    );
-}
-
-// Função auxiliar para fallbacks, não lê o input
-async function loadWeatherByCityNameFromText(city) {
-    try {
-        const coords = await getCoordsForCity(city, userApiKey);
-        await fetchAndDisplayWeather(coords.lat, coords.lon, userApiKey);
-    } catch (error) {
-        console.error(`Falha no fallback para "${city}":`, error);
-        document.getElementById('weather-city').textContent = 'Erro de fallback';
-    }
-}
-
 
 // Event Listeners para o clima
 weatherWidget.addEventListener('click', () => weatherDetailsPanel.classList.toggle('hidden'));
 document.getElementById('update-weather-button').addEventListener('click', loadWeatherByCityName);
 
-// --- FIM: Bloco de Integração com OpenWeatherMap ---
+// --- FIM: NOVO Bloco de Integração com o Backend ---
 
+
+// --- O restante do código da garagem permanece o mesmo ---
+
+// --- Constants for Maintenance ---
+const OIL_CHANGE_INTERVAL = 5000; // km
+const TIRE_CHECK_INTERVAL = 10000; // km
+const GENERAL_SERVICE_INTERVAL = 20000; // km
 
 // --- Utility for unique IDs ---
 let nextVehicleId = 1;
@@ -694,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica de Inicialização do Clima ---
     const weatherCache = JSON.parse(localStorage.getItem('weatherCache') || 'null');
     if (weatherCache && weatherCache.lat && weatherCache.lon) {
-        fetchAndDisplayWeather(weatherCache.lat, weatherCache.lon, userApiKey);
+        fetchWeatherFromBackend({ lat: weatherCache.lat, lon: weatherCache.lon });
     } else {
         getWeatherByGeolocation();
     }
