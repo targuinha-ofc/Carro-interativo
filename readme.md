@@ -1,14 +1,44 @@
-Garagem Virtual V3 Descrição Garagem Virtual V3 é uma aplicação web simples para simular e gerenciar uma coleção de veículos. Permite adicionar diferentes tipos de veículos (Carro Normal, Carro Esportivo, Caminhão), visualizar seus detalhes, interagir com eles (ligar/desligar, acelerar/frear, usar turbo, carregar/descarregar) e registrar/visualizar um histórico de manutenções.
+# Garagem Inteligente Pro - Backend
 
-Este projeto demonstra conceitos de Programação Orientada a Objetos (POO) em JavaScript, incluindo classes, herança, encapsulamento (básico), e manipulação do DOM para criar uma interface interativa. O código foi refatorado para usar Módulos ES6 para melhor organização.
+Servidor Node.js/Express para a aplicação Garagem Inteligente Pro.
 
-Funcionalidades Principais Adicionar Veículos: Adicione Carros Normais, Carros Esportivos e Caminhões, especificando modelo e cor (e capacidade de carga para caminhões). Listar e Selecionar: Veja a lista de veículos na garagem e selecione um para ver detalhes. Visualizar Detalhes: Veja modelo, cor, ID, status (ligado/desligado), velocidade atual (com velocímetro visual) e informações específicas (boost, carga). Interagir com Veículos: Ligar e Desligar o motor. Acelerar e Frear (com limites de velocidade e efeitos diferentes por tipo/carga). Ativar Turbo Boost (para Carros Esportivos, uso único). Carregar e Descarregar Caminhões (respeitando capacidade e estado do motor). Gerenciar Manutenções: Registrar novas manutenções (serviços realizados) ou agendar futuras. Informar data/hora, tipo de serviço, custo (opcional) e descrição. Visualizar o histórico de manutenções passadas. Visualizar os agendamentos futuros. Remover registros de manutenção individualmente. Remover Veículos: Remova veículos da garagem permanentemente. Persistência: O estado da garagem (veículos e manutenções) é salvo no LocalStorage do navegador, para que os dados persistam entre as sessões. Notificações: Feedbacks visuais para ações do usuário e lembretes de agendamentos próximos. Tecnologias Utilizadas HTML5 CSS3 (com Variáveis CSS e layout Flexbox/Grid) JavaScript (ES6+) Programação Orientada a Objetos (Classes, Herança) Módulos ES6 (import/export) Manipulação do DOM LocalStorage API SVG (para o velocímetro) Font Awesome (para ícones) Google Fonts (Poppins) Como Executar o Projeto 🚨 IMPORTANTE: Devido ao uso de Módulos JavaScript (import/export), este projeto NÃO FUNCIONARÁ corretamente se você abrir o arquivo index.html diretamente no navegador (usando file:///). É necessário servi-lo através de um servidor web local.
+## Descrição
 
-Método Recomendado (VS Code + Live Server):
+Este servidor atua como um backend para a aplicação, fornecendo uma API para gerenciamento de dados de veículos, agendamentos e um proxy para a API de clima da OpenWeatherMap.
 
-Pré-requisito: Tenha o Visual Studio Code instalado. Instale a Extensão: Abra o VS Code, vá até a aba de Extensões (ícone de blocos ou Ctrl+Shift+X), procure por Live Server (de Ritwick Dey) e clique em "Instalar". Abra a Pasta: No VS Code, abra a pasta raiz onde você clonou ou baixou este projeto (garagem-virtual). Execute: Clique com o botão direito do mouse sobre o arquivo index.html na barra lateral do VS Code e selecione a opção "Open with Live Server". Seu navegador padrão abrirá automaticamente com o projeto rodando em um endereço como http://127.0.0.1:5500/ (o número da porta pode variar). Alternativa (Python 3):
+## API Endpoints
 
-Pré-requisito: Tenha o Python 3 instalado e adicionado ao PATH do seu sistema. Navegue até a Pasta: Abra um terminal ou prompt de comando e use o comando cd para navegar até a pasta raiz do projeto (garagem-virtual). Inicie o Servidor: Digite o comando: python -m http.server Acesse no Navegador: Abra seu navegador e vá para o endereço http://localhost:8000. Alternativa (Node.js + http-server):
+### Clima
 
-Pré-requisito: Tenha o Node.js e npm instalados. Instale o http-server (se ainda não tiver): Abra um terminal e execute: npm install -g http-server (talvez precise de sudo no Linux/macOS). Navegue até a Pasta: Use cd no terminal para ir até a pasta raiz do projeto. Inicie o Servidor: Execute o comando: http-server Acesse no Navegador: Abra seu navegador e vá para um dos endereços listados no terminal (geralmente http://127.0.0.1:8080 ou http://localhost:8080).
+*   **Endpoint:** `GET /api/weather`
+*   **Descrição:** Retorna os dados atuais do clima e a previsão para 5 dias. Funciona como um proxy para a API da OpenWeatherMap, mantendo a chave de API segura no servidor.
+*   **Parâmetros de Query:**
+    *   `city={nome_da_cidade}` OU
+    *   `lat={latitude}&lon={longitude}`
+*   **Resposta de Sucesso (200):** Objeto JSON com as chaves `current` e `forecast`.
 
+### Status da Garagem (NOVO)
+
+*   **Endpoint:** `GET /api/garagem/status`
+*   **Descrição:** Fornece um resumo rápido da quantidade de veículos e agendamentos cadastrados (em memória no servidor).
+*   **Resposta de Sucesso (200):** Objeto JSON no formato `{ "totalVeiculos": number, "totalAgendamentos": number }`.
+
+### Dicas de Manutenção (NOVO)
+
+*   **Endpoint:** `GET /api/dicas/:tipoVeiculo`
+*   **Descrição:** Retorna uma lista de dicas de manutenção específicas para o tipo de veículo informado.
+*   **Parâmetro de Rota:**
+    *   `tipoVeiculo` (string): O nome da classe do veículo. Valores válidos: `Veiculo`, `CarroEsportivo`, `Caminhao`.
+*   **Resposta de Sucesso (200):** Array de strings, onde cada string é uma dica. `["Dica 1", "Dica 2"]`.
+*   **Resposta de Erro (404):** Objeto JSON com uma mensagem de erro se o `tipoVeiculo` for inválido ou não tiver dicas. `{ "message": "Tipo de veículo não encontrado..." }`.
+
+### Gerenciamento de Veículos
+
+*   **Endpoint:** `GET /api/garagem/veiculos`
+*   **Descrição:** Retorna a lista completa de veículos na garagem (em memória).
+*   **Resposta de Sucesso (200):** Array de objetos, onde cada objeto representa um veículo.
+
+*   **Endpoint:** `POST /api/garagem/veiculos`
+*   **Descrição:** Adiciona um novo veículo à garagem.
+*   **Corpo da Requisição (Body):** Objeto JSON com os dados do veículo (ex: `{ "type": "Caminhao", "modelo": "Scania", "cor": "Branco" }`).
+*   **Resposta de Sucesso (201):** O objeto do veículo recém-criado, incluindo o novo `id` gerado pelo servidor.

@@ -17,18 +17,21 @@
       <ul class="list-unstyled components">
         <li><a href="#" data-view="garage-view" class="active-view"><i class="icon-garage"></i> Minha Garagem</a></li>
         <li><a href="#" data-view="scheduling-view"><i class="icon-calendar"></i> Agendamentos</a></li>
-        <!-- Futuramente: <li><a href="#" data-view="reports-view"><i class="icon-reports"></i> Relatórios</a></li> -->
+        <!-- CORREÇÃO: Adicionado ícone e link para o Arsenal -->
+        <li><a href="#" data-view="arsenal-view"><i class="icon-database"></i> Arsenal de Dados</a></li>
       </ul>
+      <div id="garage-status-sidebar">
+        <h4>Status</h4>
+        <p id="status-veiculos">Veículos: --</p>
+        <p id="status-agendamentos">Agendamentos: --</p>
+      </div>
       <div id="notifications-area-sidebar">
-        <!-- Notifications will appear here for better visibility -->
       </div>
     </nav>
 
     <div id="main-content-area">
       <header id="main-header">
         <h1 id="current-view-title">Minha Garagem</h1>
-        
-        <!-- INÍCIO: Weather Widget -->
         <div id="weather-widget" class="loading">
           <div id="weather-main">
             <img id="weather-icon" src="" alt="Ícone do tempo">
@@ -37,14 +40,10 @@
           </div>
           <div id="weather-tip"></div>
         </div>
-        <!-- FIM: Weather Widget -->
       </header>
 
-      <!-- INÍCIO: Painel de detalhes do clima (inicialmente oculto) -->
       <div id="weather-details-panel" class="hidden">
-        <!-- A previsão detalhada será inserida aqui pelo JavaScript -->
       </div>
-      <!-- FIM: Painel de detalhes do clima -->
 
       <!-- VIEW: Minha Garagem -->
       <main id="garage-view" class="view-section active">
@@ -80,7 +79,6 @@
             </div>
           </div>
 
-          <!-- TAB: Detalhes do Veículo -->
           <div id="vehicle-details-tab" class="tab-content active">
             <div class="vehicle-details-grid">
               <div class="vehicle-image-container">
@@ -118,10 +116,16 @@
                 <button data-action="serviceGeneral">Revisão Geral</button>
                 <p><em>(Distância simulada: <span id="km-driven">0</span> km)</em></p>
               </div>
+              
+              <div class="vehicle-tips-container">
+                  <h3>Dicas do Especialista</h3>
+                  <div id="maintenance-tips-content">
+                      <p>Selecione um veículo para ver as dicas.</p>
+                  </div>
+              </div>
             </div>
           </div>
 
-          <!-- TAB: Histórico de Manutenção -->
           <div id="vehicle-history-tab" class="tab-content">
             <h3>Histórico de Manutenção para <span id="history-vehicle-model"></span></h3>
             <div class="table-responsive">
@@ -134,9 +138,7 @@
                             <th>Observações</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Linhas do histórico serão inseridas aqui -->
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
             <p id="no-maintenance-history" style="display:none;">Nenhum histórico de manutenção para este veículo.</p>
@@ -184,27 +186,48 @@
                   <th>Ações</th>
                 </tr>
               </thead>
-              <tbody>
-                <!-- Linhas de agendamento aqui -->
-              </tbody>
+              <tbody></tbody>
             </table>
           </div>
           <p id="no-appointments" style="display:none;">Nenhum agendamento encontrado.</p>
         </section>
       </main>
 
+      <!-- VIEW: Arsenal de Dados (Estrutura Corrigida e Preenchida) -->
+      <main id="arsenal-view" class="view-section" style="display: none;">
+        
+        <section class="arsenal-section">
+          <h2><i class="icon-star"></i> Veículos Estrela da Garagem</h2>
+          <div id="veiculos-estrela-container" class="arsenal-grid">
+            <p>Carregando veículos...</p>
+          </div>
+        </section>
+
+        <section class="arsenal-section">
+          <h2><i class="icon-warning"></i> Agendamentos Urgentes (Exemplo)</h2>
+          <div id="agendamentos-urgentes-container">
+            <p>Carregando agendamentos...</p>
+          </div>
+        </section>
+
+        <section class="arsenal-section">
+          <h2><i class="icon-tools"></i> Ferramentas Essenciais do Dev</h2>
+          <div id="ferramentas-dev-container">
+            <p>Carregando ferramentas...</p>
+          </div>
+        </section>
+
+      </main>
+
     </div> <!-- Fim de main-content-area -->
   </div> <!-- Fim de app-shell -->
-
   <footer id="app-footer">
     <div id="settings-area">
         <input type="text" id="owm-city" placeholder="Digite uma cidade...">
         <button id="update-weather-button">Buscar / Atualizar</button>
     </div>
     <p>© 2024 Garagem Inteligente Pro Inc.</p>
-    <div id="notifications-area-footer" style="display: none;"> 
-        <!-- Notifications for small screens -->
-    </div>
+    <div id="notifications-area-footer" style="display: none;"></div>
   </footer>
   <script src="script.js"></script>
 </body>
