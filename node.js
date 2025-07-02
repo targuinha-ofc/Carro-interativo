@@ -1,6 +1,6 @@
 // --- INÍCIO: NOVO Bloco de Integração com o Backend ---
 
-const BACKEND_URL = 'https://render.com/docs/node-version'; // <<< CONFIRME QUE ESTA É A SUA URL DO RENDER
+const BACKEND_URL = 'https://carro-interativo-ylna.onrender.com'; // <<< CONFIRME QUE ESTA É A SUA URL DO RENDER
 const weatherWidget = document.getElementById('weather-widget');
 const weatherDetailsPanel = document.getElementById('weather-details-panel');
 

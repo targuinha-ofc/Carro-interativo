@@ -17,7 +17,6 @@
       <ul class="list-unstyled components">
         <li><a href="#" data-view="garage-view" class="active-view"><i class="icon-garage"></i> Minha Garagem</a></li>
         <li><a href="#" data-view="scheduling-view"><i class="icon-calendar"></i> Agendamentos</a></li>
-        <!-- CORREÇÃO: Adicionado ícone e link para o Arsenal -->
         <li><a href="#" data-view="arsenal-view"><i class="icon-database"></i> Arsenal de Dados</a></li>
       </ul>
       <div id="garage-status-sidebar">
@@ -82,7 +81,7 @@
           <div id="vehicle-details-tab" class="tab-content active">
             <div class="vehicle-details-grid">
               <div class="vehicle-image-container">
-                <img id="vehicle-image" src="https://via.placeholder.com/400x250.png?text=Selecione+um+Veículo" alt="Imagem do Veículo">
+                <img id="vehicle-image" src="https://classic.exame.com/wp-content/uploads/2024/10/2025-mclaren-w1.jpg" alt="Imagem do Veículo">
               </div>
               <div class="vehicle-info-container">
                 <h3>Informações</h3>
@@ -193,34 +192,34 @@
         </section>
       </main>
 
-      <!-- VIEW: Arsenal de Dados (Estrutura Corrigida e Preenchida) -->
+      <!-- VIEW: Arsenal de Dados -->
       <main id="arsenal-view" class="view-section" style="display: none;">
         
         <section class="arsenal-section">
           <h2><i class="icon-star"></i> Veículos Estrela da Garagem</h2>
           <div id="veiculos-estrela-container" class="arsenal-grid">
-            <p>Carregando veículos...</p>
+            <p class="loading-message">Carregando veículos...</p>
           </div>
         </section>
 
         <section class="arsenal-section">
           <h2><i class="icon-warning"></i> Agendamentos Urgentes (Exemplo)</h2>
           <div id="agendamentos-urgentes-container">
-            <p>Carregando agendamentos...</p>
+            <p class="loading-message">Carregando agendamentos...</p>
           </div>
         </section>
 
         <section class="arsenal-section">
           <h2><i class="icon-tools"></i> Ferramentas Essenciais do Dev</h2>
           <div id="ferramentas-dev-container">
-            <p>Carregando ferramentas...</p>
+            <p class="loading-message">Carregando ferramentas...</p>
           </div>
         </section>
 
       </main>
 
-    </div> <!-- Fim de main-content-area -->
-  </div> <!-- Fim de app-shell -->
+    </div>
+  </div>
   <footer id="app-footer">
     <div id="settings-area">
         <input type="text" id="owm-city" placeholder="Digite uma cidade...">
